@@ -24,8 +24,6 @@ void pingpong(int world_rank, int world_size, int message_size, int iter, int wi
         MPI_Request* request_array = (MPI_Request*) malloc(sizeof(MPI_Request)*window*2);
         double* sendtimes = (double*) malloc(sizeof(double)*iter*world_size);
         double* recvtimes = (double*) malloc(sizeof(double)*iter*world_size);
-
-
     }
 
 int main(int argc, char ** argv)
