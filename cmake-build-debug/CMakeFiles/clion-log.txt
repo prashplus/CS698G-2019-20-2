@@ -1,4 +1,0 @@
-/home/prashant/Downloads/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -G "CodeBlocks - Unix Makefiles" /home/prashant/CLionProjects/CloudMPI
--- Configuring done
--- Generating done
--- Build files have been written to: /home/prashant/CLionProjects/CloudMPI/cmake-build-debug
