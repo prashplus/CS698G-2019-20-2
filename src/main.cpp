@@ -14,7 +14,7 @@ using namespace std;
 double time_start, time_end_send, time_end_recv;
 
 void pingpong(int world_rank, int world_size, int message_size, int iter, int window)
-    {
+    {                                                                                                                                                                        
         int i,j,k,w;
 
         char* send = (char*)malloc(window*message_size);
