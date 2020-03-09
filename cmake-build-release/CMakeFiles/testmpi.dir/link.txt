@@ -1,0 +1,1 @@
+/usr/bin/mpicxx  -O3 -DNDEBUG  -rdynamic CMakeFiles/testmpi.dir/src/cloudmpi.cpp.o CMakeFiles/testmpi.dir/src/main.cpp.o  -o testmpi 
