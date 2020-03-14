@@ -24,6 +24,51 @@ void pingpong(int world_rank, int world_size, int message_size, int iter, int wi
         MPI_Request* request_array = (MPI_Request*) malloc(sizeof(MPI_Request)*window*2);
         double* sendtimes = (double*) malloc(sizeof(double)*iter*world_size);
         double* recvtimes = (double*) malloc(sizeof(double)*iter*world_size);
+
+        int* message_tags = (int*)malloc(window* sizeof(int));
+        for (i=0;j<window;i++){
+            message_tags[i]=i;
+        }
+
+        int dist = 1;
+        while(dist < world_size) {
+            float progress = (float) dist/ (float) world_size * 100.0;
+            if(world_rank == 0) {
+                printf("%d of %d (%0.1f%%)\n", dist, world_size, progress);
+                fflush(stdout);
+            }
+
+            int send_rank = (world_rank + dist + world_size) % world_size;
+            int recv_rank = (world_rank - dist + world_size) % world_size;
+
+            for(i=0;i<iter;i++){
+                //Sync steps
+                MPI_Barrier(MPI_COMM_WORLD);
+
+                TIME_START;
+                k = -1;
+
+                for(w=0; w<window; w++){
+                    k++;
+                    MPI_Irecv(&recv[w*message_size], message_size, MPI_BYTE, recv_rank, MPI_ANY_TAG, MPI_COMM_WORLD, &request_array[k]);
+                }
+
+                for(w=0; w<window; w++){
+                    k++;
+                    MPI_Isend(&send[w*message_size], message_size, MPI_BYTE, recv_rank, MPI_ANY_TAG, MPI_COMM_WORLD, &request_array[k]);
+                }
+
+                int flag_sends = 0, flag_recvs =0;
+
+//                while(!flag_sends || !flag_recvs){
+//
+//                }
+
+            }
+
+        }
+
+
     }
 
 int main(int argc, char ** argv)
