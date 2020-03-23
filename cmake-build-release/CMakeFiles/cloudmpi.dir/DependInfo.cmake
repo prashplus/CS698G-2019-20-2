@@ -4,8 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/prashant/CLionProjects/CloudMPI/src/cloudmpi.cpp" "/home/prashant/CLionProjects/CloudMPI/cmake-build-release/CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o"
-  "/home/prashant/CLionProjects/CloudMPI/src/main.cpp" "/home/prashant/CLionProjects/CloudMPI/cmake-build-release/CMakeFiles/cloudmpi.dir/src/main.cpp.o"
+  "/home/prashant/CloudMPI/src/cloudmpi.cpp" "/home/prashant/CloudMPI/cmake-build-release/CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o"
+  "/home/prashant/CloudMPI/src/main.cpp" "/home/prashant/CloudMPI/cmake-build-release/CMakeFiles/cloudmpi.dir/src/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

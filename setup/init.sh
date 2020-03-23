@@ -6,8 +6,8 @@ sudo sed -i '1i52.230.7.177 test2asia' /etc/hosts
 sudo sed -i '1i52.230.4.24 test3asia' /etc/hosts
 echo "ETC/HOSTS Modified"
 rm -rf CS698G-2019-20-2
-git clone https://github.com/prashplus/CS698G-2019-20-2
-cd CS698G-2019-20-2
+git clone https://github.com/prashplus/CloudMPI
+cd CloudMPI
 touch hosts
 echo "40.121.156.19" >> hosts
 echo "52.230.7.177" >> hosts

@@ -43,10 +43,10 @@ RM = /home/prashant/Downloads/clion-2019.3.4/bin/cmake/linux/bin/cmake -E remove
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/prashant/CLionProjects/CloudMPI
+CMAKE_SOURCE_DIR = /home/prashant/CloudMPI
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/prashant/CLionProjects/CloudMPI/cmake-build-release
+CMAKE_BINARY_DIR = /home/prashant/CloudMPI/cmake-build-release
 
 # Include any dependencies generated for this target.
 include CMakeFiles/cloudmpi.dir/depend.make
@@ -59,29 +59,29 @@ include CMakeFiles/cloudmpi.dir/flags.make
 
 CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o: CMakeFiles/cloudmpi.dir/flags.make
 CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o: ../src/cloudmpi.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/prashant/CLionProjects/CloudMPI/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o"
-	/usr/bin/mpicxx  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o -c /home/prashant/CLionProjects/CloudMPI/src/cloudmpi.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/prashant/CloudMPI/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o"
+	/usr/bin/mpicxx  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o -c /home/prashant/CloudMPI/src/cloudmpi.cpp
 
 CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.i"
-	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/prashant/CLionProjects/CloudMPI/src/cloudmpi.cpp > CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.i
+	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/prashant/CloudMPI/src/cloudmpi.cpp > CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.i
 
 CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.s"
-	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/prashant/CLionProjects/CloudMPI/src/cloudmpi.cpp -o CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.s
+	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/prashant/CloudMPI/src/cloudmpi.cpp -o CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.s
 
 CMakeFiles/cloudmpi.dir/src/main.cpp.o: CMakeFiles/cloudmpi.dir/flags.make
 CMakeFiles/cloudmpi.dir/src/main.cpp.o: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/prashant/CLionProjects/CloudMPI/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/cloudmpi.dir/src/main.cpp.o"
-	/usr/bin/mpicxx  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/cloudmpi.dir/src/main.cpp.o -c /home/prashant/CLionProjects/CloudMPI/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/prashant/CloudMPI/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/cloudmpi.dir/src/main.cpp.o"
+	/usr/bin/mpicxx  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/cloudmpi.dir/src/main.cpp.o -c /home/prashant/CloudMPI/src/main.cpp
 
 CMakeFiles/cloudmpi.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cloudmpi.dir/src/main.cpp.i"
-	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/prashant/CLionProjects/CloudMPI/src/main.cpp > CMakeFiles/cloudmpi.dir/src/main.cpp.i
+	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/prashant/CloudMPI/src/main.cpp > CMakeFiles/cloudmpi.dir/src/main.cpp.i
 
 CMakeFiles/cloudmpi.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cloudmpi.dir/src/main.cpp.s"
-	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/prashant/CLionProjects/CloudMPI/src/main.cpp -o CMakeFiles/cloudmpi.dir/src/main.cpp.s
+	/usr/bin/mpicxx $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/prashant/CloudMPI/src/main.cpp -o CMakeFiles/cloudmpi.dir/src/main.cpp.s
 
 # Object files for target cloudmpi
 cloudmpi_OBJECTS = \
@@ -95,7 +95,7 @@ libcloudmpi.a: CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o
 libcloudmpi.a: CMakeFiles/cloudmpi.dir/src/main.cpp.o
 libcloudmpi.a: CMakeFiles/cloudmpi.dir/build.make
 libcloudmpi.a: CMakeFiles/cloudmpi.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/prashant/CLionProjects/CloudMPI/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libcloudmpi.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/prashant/CloudMPI/cmake-build-release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX static library libcloudmpi.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/cloudmpi.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/cloudmpi.dir/link.txt --verbose=$(VERBOSE)
 
@@ -109,6 +109,6 @@ CMakeFiles/cloudmpi.dir/clean:
 .PHONY : CMakeFiles/cloudmpi.dir/clean
 
 CMakeFiles/cloudmpi.dir/depend:
-	cd /home/prashant/CLionProjects/CloudMPI/cmake-build-release && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/prashant/CLionProjects/CloudMPI /home/prashant/CLionProjects/CloudMPI /home/prashant/CLionProjects/CloudMPI/cmake-build-release /home/prashant/CLionProjects/CloudMPI/cmake-build-release /home/prashant/CLionProjects/CloudMPI/cmake-build-release/CMakeFiles/cloudmpi.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/prashant/CloudMPI/cmake-build-release && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/prashant/CloudMPI /home/prashant/CloudMPI /home/prashant/CloudMPI/cmake-build-release /home/prashant/CloudMPI/cmake-build-release /home/prashant/CloudMPI/cmake-build-release/CMakeFiles/cloudmpi.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/cloudmpi.dir/depend
 
