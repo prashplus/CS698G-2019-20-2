@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/static/cloudmpi.h
+
+/home/prashant/CloudMPI/src/main.cpp
+mpi.h
+-
+bits/stdc++.h
+-
+sys/resource.h
+-
+unistd.h
+-
+static/cloudmpi.h
+/home/prashant/CloudMPI/src/static/cloudmpi.h
+
