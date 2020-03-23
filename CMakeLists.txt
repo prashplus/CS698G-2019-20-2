@@ -22,22 +22,22 @@ add_library(cloudmpi ${SOURCES})
 #add_executable(mainExec main.cpp)
 
 # Link against MPI
-target_link_libraries(cloudmpi ${MPI_LIBRARIES})
+#target_link_libraries(cloudmpi ${MPI_LIBRARIES})
 
-# Include MPI includes
-include_directories(${MPI_INCLUDE_PATH})
-if(MPI_COMPILE_FLAGS)
-    set_target_properties(cloudmpi PROPERTIES
-            COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
-    #    set_target_properties(cloudmpi PROPERTIES
-    #            COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
-endif()
-if(MPI_LINK_FLAGS)
-    set_target_properties(cloudmpi PROPERTIES
-            LINK_FLAGS "${MPI_LINK_FLAGS}")
-    #    set_target_properties(minisat-lib-static PROPERTIES
-    #            LINK_FLAGS "${MPI_LINK_FLAGS}")
-endif()
+## Include MPI includes
+#include_directories(${MPI_INCLUDE_PATH})
+#if(MPI_COMPILE_FLAGS)
+#    set_target_properties(cloudmpi PROPERTIES
+#            COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+#    #    set_target_properties(cloudmpi PROPERTIES
+#    #            COMPILE_FLAGS "${MPI_COMPILE_FLAGS}")
+#endif()
+#if(MPI_LINK_FLAGS)
+#    set_target_properties(cloudmpi PROPERTIES
+#            LINK_FLAGS "${MPI_LINK_FLAGS}")
+#    #    set_target_properties(minisat-lib-static PROPERTIES
+#    #            LINK_FLAGS "${MPI_LINK_FLAGS}")
+#endif()
 
 #............................................................................................
 

@@ -5,7 +5,7 @@ sudo sed -i '1i40.121.156.19 test1useast' /etc/hosts
 sudo sed -i '1i52.230.7.177 test2asia' /etc/hosts
 sudo sed -i '1i52.230.4.24 test3asia' /etc/hosts
 echo "ETC/HOSTS Modified"
-rm -rf CS698G-2019-20-2
+rm -rf CloudMPI
 git clone https://github.com/prashplus/CloudMPI
 cd CloudMPI
 touch hosts
