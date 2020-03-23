@@ -2,7 +2,7 @@
 #include <bits/stdc++.h>
 #include <sys/resource.h>
 #include <unistd.h>
-#include "cloudmpi.h"
+#include "static/cloudmpi.h"
 
 using namespace std;
 

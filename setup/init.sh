@@ -15,5 +15,6 @@ echo "52.230.4.24" >> hosts
 echo "MPI hostfile Modified"
 cd cmake-build-release
 make clean
+echo "Clean Complete"
 make
 echo "Program ready to execute"

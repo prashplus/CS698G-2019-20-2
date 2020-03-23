@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcloudmpi.a  CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o CMakeFiles/cloudmpi.dir/src/main.cpp.o
-/usr/bin/ranlib libcloudmpi.a

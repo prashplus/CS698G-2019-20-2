@@ -1,4 +1,0 @@
-/usr/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -G "CodeBlocks - Unix Makefiles" /home/prashant/CloudMPI
--- Configuring done
--- Generating done
--- Build files have been written to: /home/prashant/CloudMPI/cmake-build-release
