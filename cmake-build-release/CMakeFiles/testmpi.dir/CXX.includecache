@@ -8,16 +8,14 @@
 
 ../include/cloudmpi.h
 
-/home/prashant/CLionProjects/CloudMPI/src/cloudmpi.cpp
-bits/stdc++.h
--
-mpi.h
--
-
 /home/prashant/CLionProjects/CloudMPI/src/main.cpp
 mpi.h
 -
 bits/stdc++.h
+-
+sys/resource.h
+-
+unistd.h
 -
 cloudmpi.h
 /home/prashant/CLionProjects/CloudMPI/src/cloudmpi.h
