@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/cloudmpi.dir/src/cloudmpi.cpp.o"
   "CMakeFiles/cloudmpi.dir/src/main.cpp.o"
-  "libcloudmpi.a"
   "libcloudmpi.pdb"
+  "libcloudmpi.a"
 )
 
 # Per-language clean rules from dependency scanning.

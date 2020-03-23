@@ -1,4 +1,4 @@
-/home/prashant/Downloads/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -G "CodeBlocks - Unix Makefiles" /home/prashant/CloudMPI
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/mpicc -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx -G "CodeBlocks - Unix Makefiles" /home/prashant/CloudMPI
 -- The C compiler identification is GNU 9.2.1
 -- The CXX compiler identification is GNU 9.2.1
 -- Check for working C compiler: /usr/bin/mpicc
@@ -13,9 +13,6 @@
 -- Detecting CXX compiler ABI info - done
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
--- Found MPI_C: /usr/bin/mpicc (found version "3.1") 
--- Found MPI_CXX: /usr/bin/mpicxx (found version "3.1") 
--- Found MPI: TRUE (found version "3.1")  
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /home/prashant/CloudMPI/cmake-build-release
