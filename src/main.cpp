@@ -202,7 +202,7 @@ void code(int mypid, int nnodes, int size, int times, int window)
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
                 if (val != 0.0) { val = MBsec * (double) times / val; }
-                printf("%0.3f\t\t\t", val);
+                printf("%0.3f\t\t", val);
             }
             printf("\n");
         }
@@ -235,17 +235,17 @@ void code(int mypid, int nnodes, int size, int times, int window)
 
         /* print receive bandwidth table */
         printf("\n");
-        printf("Recv\t");
+        printf("Recv\t\t\t");
         for(k=0; k<nnodes; k++) {
             printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
         }
         printf("\n");
         for(j=0; j<nnodes; j++) {
-            printf("%s:%d from\t", &hostnames[j*sizeof(hostname)], j);
+            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
                 if (val != 0.0) { val = MBsec * (double) times / val; }
-                printf("%0.3f\t", val);
+                printf("%0.3f\t\t", val);
             }
             printf("\n");
         }
