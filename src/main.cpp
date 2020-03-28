@@ -192,17 +192,17 @@ void code(int mypid, int nnodes, int size, int times, int window)
 
         /* print send bandwidth table */
         printf("\n");
-        printf("Send\t");
+        printf("Send\t\t\t");
         for(k=0; k<nnodes; k++) {
             printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
         }
         printf("\n");
         for(j=0; j<nnodes; j++) {
-            printf("%s:%d to\t", &hostnames[j*sizeof(hostname)], j);
+            printf("%s:%d to\t\t", &hostnames[j*sizeof(hostname)], j);
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
                 if (val != 0.0) { val = MBsec * (double) times / val; }
-                printf("%0.3f\t", val);
+                printf("%0.3f\t\t\t", val);
             }
             printf("\n");
         }
@@ -277,6 +277,14 @@ int main(int argc, char ** argv)
     MPI_Init(&argc,&argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+    //TEST CODE
+    char processor_name[MPI_MAX_PROCESSOR_NAME];
+    int len;
+    MPI_Get_processor_name(processor_name, &len);
+    cout<<"Hello World ! from processor "<< processor_name<<" rank "<<rank<<" out of "<<ranks<<" processors\n";
+    cout<<"Sum :"<<add(5,6);
+    //TEST CODE END
 
     /* collect hostnames of all the processes */
     gethostname(hostname, sizeof(hostname));
