@@ -169,6 +169,10 @@ void code(int mypid, int nnodes, int size, int times, int window)
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Gather(sendsums, nnodes, MPI_DOUBLE, allsums, nnodes, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
+    int r = nnodes;
+    double **arr = (double **)malloc(r * sizeof(double *));
+    for (i=0; i<r; i++)
+        arr[i] = (double *)malloc(r * sizeof(double));
     /* rank 0 computes send stats and prints result */
     if (mypid == 0) {
         /* compute stats over all nodes */
@@ -202,6 +206,7 @@ void code(int mypid, int nnodes, int size, int times, int window)
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
                 if (val != 0.0) { val = MBsec * (double) times / val; }
+                arr[j][k]=val;
                 printf("%0.3f\t\t", val);
             }
             printf("\n");
@@ -245,11 +250,27 @@ void code(int mypid, int nnodes, int size, int times, int window)
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
                 if (val != 0.0) { val = MBsec * (double) times / val; }
+                arr[j][k]+=val;
                 printf("%0.3f\t\t", val);
             }
             printf("\n");
         }
+
+        /* Combined Matrix*/
+        printf("\n");
+        printf("Recv\t\t\t");
+        for(k=0; k<nnodes; k++) {
+            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+        }
+        for(j=0; j<nnodes; j++) {
+            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(k=0; k<nnodes; k++) {
+                printf("%0.3f\t\t", arr[j][k]);
+            }
+            printf("\n");
+        }
     }
+
 
     /* free off memory */
     if (mypid == 0) {
