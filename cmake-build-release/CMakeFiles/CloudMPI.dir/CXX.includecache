@@ -11,4 +11,10 @@ bits/stdc++.h
 -
 mpi.h
 -
+sys/resource.h
+-
+unistd.h
+-
+sys/time.h
+-
 

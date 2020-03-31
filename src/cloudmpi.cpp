@@ -379,7 +379,7 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
             ss >> FullStrList[i];   //  stringstream into string for each node name
             ss.str(""); //  This and below clear the contents of the stringstream,
             ss.clear(); //  since the >> operator doesn't clear as it extracts
-            //cout << FullStrList[i] << endl;   //  for testing
+            cout << FullStrList[i] << endl;   //  for testing
         }
         delete NodeNameList;    //  master is done with full c-array
         bool IsUnique;  //  flag for breaking from for loop
