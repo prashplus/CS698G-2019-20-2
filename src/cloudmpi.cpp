@@ -83,6 +83,7 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
 
     /* collect hostnames of all the processes */
     gethostname(hostname, sizeof(hostname));
+    cout<<hostname;
     hostnames = (char*) malloc(sizeof(hostname)*nnodes);
     MPI_Gather(hostname, sizeof(hostname), MPI_CHAR, hostnames, sizeof(hostname), MPI_CHAR, 0, MPI_COMM_WORLD);
     
