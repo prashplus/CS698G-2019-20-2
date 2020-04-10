@@ -89,14 +89,9 @@ int main(int argc, char ** argv)
     MPI_Group world_group;
     MPI_Comm_group(MPI_COMM_WORLD, &world_group);
 
-    int r[MasterSize],i,j,k;
+    int rootRing[MasterSize],i,j,k;
     int *rankMatrix,*rankData;
 
-//    if(rank == 0){
-//        rankMatrix = (int **)malloc(ranks * sizeof(int *));
-//        for (i=0; i<ranks; i++)
-//            rankMatrix[i] = (int *)malloc(3 * sizeof(int));
-//    }
     rankMatrix = (int*)malloc(sizeof(int)*3*ranks);
     rankData = (int*)malloc(sizeof(int)*3);
     rankData[0]=rank;
@@ -104,7 +99,7 @@ int main(int argc, char ** argv)
     rankData[2]=MasterRank;
 
     MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Gather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Allgather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, MPI_COMM_WORLD);
 
     if(rank == 0){
         printf("\n");
@@ -112,15 +107,51 @@ int main(int argc, char ** argv)
         printf("\n");
         printf("World Rank\tNode Rank\tMaster Rank\n");
         for(j=0; j<ranks; j++) {
-            for(k=0; k<3; k++) {
-                int val = rankMatrix[j*3+k];
+            for (k = 0; k < 3; k++) {
+                int val = rankMatrix[j * 3 + k];
                 printf("%d\t\t", val);
             }
             printf("\n");
         }
     }
+    j=0;
+    for(i=0;i<ranks;i++){
+        if(rankMatrix[i*3+1]==0){
+            rootRing[j++]=i;
+        }
+    }
+    if(rank == 0) {
+        printf("\n");
+        for (i = 0; i < MasterSize; i++) {
+            printf("%d\t", rootRing[i]);
+        }
+    }
 
+    // Construct a group containing all of the 0 NodeRanks in world_group
+    MPI_Group rootGroup;
+    MPI_Group_incl(world_group, MasterSize, rootRing, &rootGroup);
+
+    // Create a new communicator based on the group
+    MPI_Comm root_comm;
+    MPI_Comm_create_group(MPI_COMM_WORLD, rootGroup, 0, &root_comm);
+
+    int root_rank = -1, root_size = -1;
+    // If this rank isn't in the new communicator, it will be
+    // MPI_COMM_NULL. Using MPI_COMM_NULL for MPI_Comm_rank or
+    // MPI_Comm_size is erroneous
+    if (MPI_COMM_NULL != root_comm) {
+        MPI_Comm_rank(root_comm, &root_rank);
+        MPI_Comm_size(root_comm, &root_size);
+    }
+
+    cout << '\n' << NodeNameStr;
+    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d", rank, NodeRank, MasterRank, root_rank);
+    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d | Root Size : %d\n", ranks, NodeSize, MasterSize, root_size);
     /* shut down */
+    MPI_Group_free(&world_group);
+    MPI_Group_free(&rootGroup);
+    MPI_Comm_free(&root_comm);
+
     MPI_Finalize();
     return 0;
 }
