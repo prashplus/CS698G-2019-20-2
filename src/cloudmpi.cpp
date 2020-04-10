@@ -327,7 +327,7 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
             NodeNameTotalLen = 0;
     //  Get the name and name character count of each core's node
     MPI::Get_processor_name(NodeName, NodeNameLen);
-    cout<<NodeName;
+    //cout<<NodeName;
     //  Prepare a vector for character counts of node names
     if (Rank == MASTER)
         NodeNameCountVect = new int [Size];
