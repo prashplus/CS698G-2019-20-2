@@ -149,22 +149,31 @@ int main(int argc, char ** argv)
 //    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d | Root Size : %d\n", ranks, NodeSize, MasterSize, root_size);
     double time,*data;
     data = (double *)malloc(sizeof(double)*size);
-
+    time -= MPI_Wtime();
     if(MPI_COMM_NULL != root_comm){
         MPI_Barrier(root_comm);
-        time -= MPI_Wtime();
+        //time -= MPI_Wtime();
         MPI_Bcast(data, size, MPI_DOUBLE, 0, root_comm);
         MPI_Barrier(root_comm);
-        time += MPI_Wtime();
-        printf("\nRoot Node :\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d | Time : %lf\n", rank, NodeRank, MasterRank, root_rank, time);
+        //time += MPI_Wtime();
+        //printf("\nRoot Node :\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d | Time : %lf\n", rank, NodeRank, MasterRank, root_rank, time);
     }
 
     MPI_Barrier(NodeComm);
-    time -= MPI_Wtime();
+    //time -= MPI_Wtime();
     MPI_Bcast(data, size, MPI_DOUBLE, 0, NodeComm);
     MPI_Barrier(NodeComm);
     time += MPI_Wtime();
-    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d | Time : %lf", rank, NodeRank, MasterRank, root_rank, time);
+    if(NodeRank == 0)
+        printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d | Time : %lf", rank, NodeRank, MasterRank, root_rank, time);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    time -= MPI_Wtime();
+    MPI_Bcast(data, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    time += MPI_Wtime();
+    if(rank == 0)
+        printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d | Time : %lf\n", rank, NodeRank, MasterRank, root_rank, time);
 
 
     /* shut down */
