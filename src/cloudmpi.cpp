@@ -216,8 +216,8 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
             printf("%s:%d to\t\t", &hostnames[j*sizeof(hostname)], j);
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
+                arr[j][k]=val/times;
                 if (val != 0.0) { val = MBsec * (double) times / val; }
-                arr[j][k]=val;
                 printf("%0.3f\t\t", val);
             }
             printf("\n");
@@ -260,8 +260,8 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
             printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
+                arr[j][k]+=val/times;
                 if (val != 0.0) { val = MBsec * (double) times / val; }
-                arr[j][k]+=val;
                 printf("%0.3f\t\t", val);
             }
             printf("\n");
@@ -510,6 +510,239 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
 
     return IsOk;
 }
+
+void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm){
+
+    int world_rank = MPI::COMM_WORLD.Get_rank();
+    int world_size = MPI::COMM_WORLD.Get_size();
+
+    int NodeRank, MasterRank, NodeSize, MasterSize;
+    string NodeNameStr;
+    bool b = CommByNode(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr);
+
+    cout<<'\n'<<NodeNameStr;
+    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d",world_rank,NodeRank,MasterRank);
+    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d\n",world_size,NodeSize,MasterSize);
+    //Matrix end
+
+    //Get the group of processes in MPI_COMM_WORLD
+
+
+
+    MPI_Group world_group;
+    MPI_Comm_group(MPI_COMM_WORLD, &world_group);
+
+    int rootRing[MasterSize],i,j,k;
+    int *rankMatrix,*rankData;
+
+    rankMatrix = (int*)malloc(sizeof(int)*3*world_size);
+    rankData = (int*)malloc(sizeof(int)*3);
+    rankData[0]=world_rank;
+    rankData[1]=NodeRank;
+    rankData[2]=MasterRank;
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allgather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, MPI_COMM_WORLD);
+
+//    if(rank == 0){
+//        printf("\n");
+//        printf("\t\tRank Data\n");
+//        printf("\n");
+//        printf("World Rank\tNode Rank\tMaster Rank\n");
+//        for(j=0; j<ranks; j++) {
+//            for (k = 0; k < 3; k++) {
+//                int val = rankMatrix[j * 3 + k];
+//                printf("%d\t\t", val);
+//            }
+//            printf("\n");
+//        }
+//    }
+    j=0;
+    for(i=0;i<world_size;i++){
+        if(rankMatrix[i*3+1]==0){
+            rootRing[j++]=i;
+        }
+    }
+//    if(rank == 0) {
+//        printf("\n");
+//        for (i = 0; i < MasterSize; i++) {
+//            printf("%d\t", rootRing[i]);
+//        }
+//    }
+
+    // Construct a group containing all of the 0 NodeRanks in world_group
+    MPI_Group rootGroup;
+    MPI_Group_incl(world_group, MasterSize, rootRing, &rootGroup);
+
+    // Create a new communicator based on the group
+
+    MPI_Comm_create_group(MPI_COMM_WORLD, rootGroup, 0, &root_comm);
+
+    int root_rank = -1, root_size = -1;
+    // If this rank isn't in the new communicator, it will be
+    // MPI_COMM_NULL. Using MPI_COMM_NULL for MPI_Comm_rank or
+    // MPI_Comm_size is erroneous
+    if (MPI_COMM_NULL != root_comm) {
+        MPI_Comm_rank(root_comm, &root_rank);
+        MPI_Comm_size(root_comm, &root_size);
+    }
+
+    cout << '\n' << NodeNameStr;
+    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
+    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d | Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
+
+
+    free(rankMatrix);
+    free(rankData);
+
+    MPI_Group_free(&world_group);
+    MPI_Group_free(&rootGroup);
+}
+
+bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
+                int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
+                string &NodeNameStr, double **dist)
+{
+    bool IsOk = true;
+
+    int Rank = MPI::COMM_WORLD.Get_rank();
+    int Size = MPI::COMM_WORLD.Get_size();
+    int i,j;
+    int CommGroup = -1,*rankmark;
+    if(Rank == 0) {
+        int temp = 0;
+        rankmark = (int *) malloc(sizeof(int) * Size);
+        for(i=0;i<Size;i++){
+            rankmark[i] = -1;
+        }
+        for (i = 0; i < Size; i++) {
+            if(rankmark[i] == -1){
+                rankmark[i]=temp;
+                for (j=0;j< Size;j++){
+                    if(i!=j && dist[i][j]<80.0){
+                        rankmark[j]=temp;
+                    }
+                }
+                temp++;
+            }
+        }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Bcast(rankmark,Size,MPI_INT,0,MPI_COMM_WORLD);
+    CommGroup = rankmark[Rank];
+
+    //  In case process fails, error prints and job aborts.
+    if (CommGroup < 0){
+        cout << "**ERROR** Rank " << Rank << " didn't identify comm group correctly." << endl;
+        IsOk = false;
+    }
+
+    //  Create node communicators
+    NodeComm = MPI::COMM_WORLD.Split(CommGroup, 0);
+    NodeSize = NodeComm.Get_size();
+    NodeRank = NodeComm.Get_rank();
+
+    //  Group for master communicator
+    int MasterGroup;
+    if (NodeRank == MASTER)
+        MasterGroup = 0;
+    else
+        MasterGroup = MPI_UNDEFINED;
+
+    //  Create master communicator
+    MasterComm = MPI::COMM_WORLD.Split(MasterGroup, 0);
+    MasterRank = -1;
+    MasterSize = -1;
+    if (MasterComm != MPI::COMM_NULL){
+        MasterRank = MasterComm.Get_rank();
+        MasterSize = MasterComm.Get_size();
+    }
+
+    MPI::COMM_WORLD.Bcast(&MasterSize, 1, MPI::INT, MASTER);
+    NodeComm.Bcast(&MasterRank, 1, MPI::INT, MASTER);
+
+    return IsOk;
+}
+
+void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist){
+
+    int world_rank = MPI::COMM_WORLD.Get_rank();
+    int world_size = MPI::COMM_WORLD.Get_size();
+
+    int NodeRank, MasterRank, NodeSize, MasterSize;
+    string NodeNameStr;
+    bool b = l1_CommByNode(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr,dist);
+
+    cout<<'\n'<<NodeNameStr;
+    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d",world_rank,NodeRank,MasterRank);
+    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d\n",world_size,NodeSize,MasterSize);
+    //Matrix end
+
+    //Get the group of processes in MPI_COMM_WORLD
+    MPI_Group world_group;
+    MPI_Comm_group(MPI_COMM_WORLD, &world_group);
+
+    int rootRing[MasterSize],i,j,k;
+    int *rankMatrix,*rankData;
+
+    rankMatrix = (int*)malloc(sizeof(int)*3*world_size);
+    rankData = (int*)malloc(sizeof(int)*3);
+    rankData[0]=world_rank;
+    rankData[1]=NodeRank;
+    rankData[2]=MasterRank;
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allgather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, MPI_COMM_WORLD);
+
+//    if(rank == 0){
+//        printf("\n");
+//        printf("\t\tRank Data\n");
+//        printf("\n");
+//        printf("World Rank\tNode Rank\tMaster Rank\n");
+//        for(j=0; j<ranks; j++) {
+//            for (k = 0; k < 3; k++) {
+//                int val = rankMatrix[j * 3 + k];
+//                printf("%d\t\t", val);
+//            }
+//            printf("\n");
+//        }
+//    }
+    j=0;
+    for(i=0;i<world_size;i++){
+        if(rankMatrix[i*3+1]==0){
+            rootRing[j++]=i;
+        }
+    }
+
+    // Construct a group containing all of the 0 NodeRanks in world_group
+    MPI_Group rootGroup;
+    MPI_Group_incl(world_group, MasterSize, rootRing, &rootGroup);
+
+    // Create a new communicator based on the group
+
+    MPI_Comm_create_group(MPI_COMM_WORLD, rootGroup, 0, &root_comm);
+
+    int root_rank = -1, root_size = -1;
+    // If this rank isn't in the new communicator, it will be
+    // MPI_COMM_NULL. Using MPI_COMM_NULL for MPI_Comm_rank or
+    // MPI_Comm_size is erroneous
+    if (MPI_COMM_NULL != root_comm) {
+        MPI_Comm_rank(root_comm, &root_rank);
+        MPI_Comm_size(root_comm, &root_size);
+    }
+
+    cout << '\n' << NodeNameStr;
+    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
+    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d | Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
+
+
+    free(rankMatrix);
+    free(rankData);
+
+    MPI_Group_free(&world_group);
+    MPI_Group_free(&rootGroup);
+}
+
 
 int add(int a, int b) {
     return a+b;
