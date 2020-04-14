@@ -56,20 +56,9 @@ struct timezone g_timezone;
 #define __TIME_USECS_RECV__ ((g_timeval__end_recv - g_timeval__start) * 1000000.0)
 double g_timeval__start, g_timeval__end_send, g_timeval__end_recv;
 
+
 #endif /* of USE_GETTIMEOFDAY */
 
-
-/* =============================================================
- * MAIN TIMING LOGIC
- * Uses a ring-based (aka. shift-based) algorithm.
- * 1) First, logically arrange the MPI tasks
- *    from left to right from rank 0 to rank N-1 in a circular array.
- * 2) Then, during each step, each task sends messages to the task D uints to the right
- *    and receives from task D units to the left.
- *    In each step, each tasks measures its send and receive bandwidths.
- * 3) There are N-1 such steps so that each task has sent to and received from every task.
- * =============================================================
- */
 double ** code(int mypid, int nnodes, int size, int times, int window)
 {
     /* arguments are:
@@ -200,27 +189,27 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
         }
 
         /* print send stats */
-        sendmin /= (double) times;
-        sendsum /= (double) (nnodes)*(nnodes-1)*times;
-        printf("\nSend max\t%f\n", MBsec/sendmin);
-        printf("Send avg\t%f\n", MBsec/sendsum);
-
-        /* print send bandwidth table */
-        printf("\n");
-        printf("Send\t\t\t");
-        for(k=0; k<nnodes; k++) {
-            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-        }
-        printf("\n");
+//        sendmin /= (double) times;
+//        sendsum /= (double) (nnodes)*(nnodes-1)*times;
+//        printf("\nSend max\t%f\n", MBsec/sendmin);
+//        printf("Send avg\t%f\n", MBsec/sendsum);
+//
+//        /* print send bandwidth table */
+//        printf("\n");
+//        printf("Send\t\t\t");
+//        for(k=0; k<nnodes; k++) {
+//            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+//        }
+//        printf("\n");
         for(j=0; j<nnodes; j++) {
-            printf("%s:%d to\t\t", &hostnames[j*sizeof(hostname)], j);
+            //printf("%s:%d to\t\t", &hostnames[j*sizeof(hostname)], j);
             for(k=0; k<nnodes; k++) {
                 double val = allsums[j*nnodes+k];
                 arr[j][k]=val/times;
                 if (val != 0.0) { val = MBsec * (double) times / val; }
-                printf("%0.3f\t\t", val);
+                //printf("%0.3f\t\t", val);
             }
-            printf("\n");
+            //printf("\n");
         }
     }
 
@@ -244,43 +233,29 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
         }
 
         /* print receive stats */
-        recvmin /= (double) times;
-        recvsum /= (double) (nnodes)*(nnodes-1)*times;
-        printf("\nRecv max\t%f\n", MBsec/recvmin);
-        printf("Recv avg\t%f\n", MBsec/recvsum);
-
-        /* print receive bandwidth table */
-        printf("\n");
-        printf("Recv\t\t\t");
-        for(k=0; k<nnodes; k++) {
-            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-        }
-        printf("\n");
-        for(j=0; j<nnodes; j++) {
-            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-            for(k=0; k<nnodes; k++) {
-                double val = allsums[j*nnodes+k];
-                arr[j][k]+=val/times;
-                if (val != 0.0) { val = MBsec * (double) times / val; }
-                printf("%0.3f\t\t", val);
-            }
-            printf("\n");
-        }
-
-        /* Combined Matrix*/
+//        recvmin /= (double) times;
+//        recvsum /= (double) (nnodes)*(nnodes-1)*times;
+//        printf("\nRecv max\t%f\n", MBsec/recvmin);
+//        printf("Recv avg\t%f\n", MBsec/recvsum);
+//
+//        /* print receive bandwidth table */
 //        printf("\n");
-//        printf("Combined\t\t\t");
+//        printf("Recv\t\t\t");
 //        for(k=0; k<nnodes; k++) {
 //            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
 //        }
 //        printf("\n");
-//        for(j=0; j<nnodes; j++) {
-//            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-//            for(k=0; k<nnodes; k++) {
-//                printf("%0.3f\t\t", arr[j][k]);
-//            }
-//            printf("\n");
-//        }
+        for(j=0; j<nnodes; j++) {
+            //printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(k=0; k<nnodes; k++) {
+                double val = allsums[j*nnodes+k];
+                arr[j][k]+=val/times;
+                if (val != 0.0) { val = MBsec * (double) times / val; }
+                //printf("%0.3f\t\t", val);
+            }
+            //printf("\n");
+        }
+
     }
 
 
@@ -520,15 +495,6 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
     string NodeNameStr;
     bool b = CommByNode(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr);
 
-    cout<<'\n'<<NodeNameStr;
-    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d",world_rank,NodeRank,MasterRank);
-    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d\n",world_size,NodeSize,MasterSize);
-    //Matrix end
-
-    //Get the group of processes in MPI_COMM_WORLD
-
-
-
     MPI_Group world_group;
     MPI_Comm_group(MPI_COMM_WORLD, &world_group);
 
@@ -563,12 +529,6 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
             rootRing[j++]=i;
         }
     }
-//    if(rank == 0) {
-//        printf("\n");
-//        for (i = 0; i < MasterSize; i++) {
-//            printf("%d\t", rootRing[i]);
-//        }
-//    }
 
     // Construct a group containing all of the 0 NodeRanks in world_group
     MPI_Group rootGroup;
@@ -587,11 +547,11 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
         MPI_Comm_size(root_comm, &root_size);
     }
 
-    cout << '\n' << NodeNameStr;
-    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
-    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d | Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
+//    cout << '\n' << NodeNameStr;
+    printf("\nReal Rank : %d | NodeRank : %d | L2 MasterRank : %d | L2 Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
+    printf("\nReal Size : %d | NodeSize : %d | L2 MasterSize : %d | L2 Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
 
-
+    //cout<<"Done L2 Comm";
     free(rankMatrix);
     free(rankData);
 
@@ -599,7 +559,7 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
     MPI_Group_free(&rootGroup);
 }
 
-bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
+bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
                 string &NodeNameStr, double **dist)
 {
@@ -608,12 +568,11 @@ bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     int Rank = MPI::COMM_WORLD.Get_rank();
     int Size = MPI::COMM_WORLD.Get_size();
     int i,j;
-    int CommGroup = -1,*rankmark;
+    int CommGroup = -1,*rankmark = (int *) malloc(sizeof(int) * Size);
     if(Rank == 0) {
         int temp = 0;
-        rankmark = (int *) malloc(sizeof(int) * Size);
         for(i=0;i<Size;i++){
-            rankmark[i] = -1;
+            rankmark[i] = i;
         }
         for (i = 0; i < Size; i++) {
             if(rankmark[i] == -1){
@@ -626,11 +585,13 @@ bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 temp++;
             }
         }
+
     }
+
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(rankmark,Size,MPI_INT,0,MPI_COMM_WORLD);
     CommGroup = rankmark[Rank];
-
+    //printf("\nCommGroup : %d | Rank : %d",CommGroup,Rank);
     //  In case process fails, error prints and job aborts.
     if (CommGroup < 0){
         cout << "**ERROR** Rank " << Rank << " didn't identify comm group correctly." << endl;
@@ -641,7 +602,7 @@ bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     NodeComm = MPI::COMM_WORLD.Split(CommGroup, 0);
     NodeSize = NodeComm.Get_size();
     NodeRank = NodeComm.Get_rank();
-
+    //cout<<"\nRanking Done L1commby datacenter";
     //  Group for master communicator
     int MasterGroup;
     if (NodeRank == MASTER)
@@ -664,6 +625,7 @@ bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     return IsOk;
 }
 
+
 void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist){
 
     int world_rank = MPI::COMM_WORLD.Get_rank();
@@ -671,12 +633,8 @@ void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
 
     int NodeRank, MasterRank, NodeSize, MasterSize;
     string NodeNameStr;
-    bool b = l1_CommByNode(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr,dist);
+    bool b = l1_CommByDatacenter(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr,dist);
 
-    cout<<'\n'<<NodeNameStr;
-    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d",world_rank,NodeRank,MasterRank);
-    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d\n",world_size,NodeSize,MasterSize);
-    //Matrix end
 
     //Get the group of processes in MPI_COMM_WORLD
     MPI_Group world_group;
@@ -732,8 +690,8 @@ void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
     }
 
     cout << '\n' << NodeNameStr;
-    printf("\nReal Rank : %d | NodeRank : %d | MasterRank : %d | Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
-    printf("\nReal Size : %d | NodeSize : %d | MasterSize : %d | Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
+    printf("\nReal Rank : %d | NodeRank : %d | L1 MasterRank : %d | L1 Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
+    printf("\nReal Size : %d | NodeSize : %d | L1 MasterSize : %d | L1 Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
 
 
     free(rankMatrix);

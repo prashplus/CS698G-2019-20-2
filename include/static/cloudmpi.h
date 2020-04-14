@@ -17,7 +17,7 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
 
 void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm);
 
-bool l1_CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
+bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                    int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
                    string &NodeNameStr, double ** dist);
 void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist);
