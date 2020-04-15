@@ -8,8 +8,9 @@ using namespace std;
 
 #define MASTER 0
 
-int world_rank, world_size, size, times, window;
-int args[3];
+long size, times, window;
+int world_rank, world_size;
+double THRESHOLD;
 
 void test1(){
     //TEST CODE
@@ -26,7 +27,7 @@ double ** test2(){
     if (world_rank == 0) {
         /* mark start of output */
         printf("START mpiGraph \n");
-        printf("MsgSize\t%d\nTimes\t%d\nWindow\t%d\n",size,times,window);
+        printf("MsgSize\t%ld\nTimes\t%ld\nWindow\t%ld\n",size,times,window);
         printf("Procs\t%d\n\n",world_size);
     }
 
@@ -34,22 +35,6 @@ double ** test2(){
     MPI_Barrier(MPI_COMM_WORLD);
     double ** dist = code(world_rank, world_size, size, times, window);
     MPI_Barrier(MPI_COMM_WORLD);
-
-    if(world_rank == 0){
-        printf("\n");
-        printf("Combined\t\t\t");
-        for(int k=0; k<world_size; k++) {
-            //printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-        }
-        printf("\n");
-        for(int j=0; j<world_size; j++) {
-            //printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-            for(int k=0; k<world_size; k++) {
-                printf("%0.3f\t\t", dist[j][k]);
-            }
-            printf("\n");
-        }
-    }
 
     /* mark end of output */
     if (world_rank == 0) { printf("END mpiGraph\n"); }
@@ -65,17 +50,17 @@ int main(int argc, char ** argv)
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     char *end;
     /* set job parameters, read values from command line if they're there */
-    size = 1000000;
-    times = 100;
-    window = 50;
-    if (argc == 4) {
+    size = 10000;
+    times = 10;
+    window = 10;
+    THRESHOLD = 500.0;
+
+    if (argc == 5) {
         size   = strtol(argv[1],&end,10);
         times  = strtol(argv[2],&end,10);
         window = strtol(argv[3],&end,10);
+        THRESHOLD = strtol(argv[4],&end,10);
     }
-    args[0] = size;
-    args[1] = times;
-    args[2] = window;
 
     //Test 1 : Processor Name
     //test1();
@@ -116,8 +101,7 @@ int main(int argc, char ** argv)
     time2 += MPI_Wtime();
     if(world_rank == 0)
         printf("\nMPI_BCAST: Real Rank : %d | Time : %lf", world_rank, time2);
-
-    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist);
+    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, THRESHOLD);
 
     free(data);
     /* shut down */

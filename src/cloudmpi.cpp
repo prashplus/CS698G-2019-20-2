@@ -13,6 +13,7 @@ char  hostname[256];
 char* hostnames;
 char VERS[] = "1.5";
 #define MASTER 0
+//#define THRESHOLD 500.0
 
 
 /* =============================================================
@@ -59,7 +60,7 @@ double g_timeval__start, g_timeval__end_send, g_timeval__end_recv;
 
 #endif /* of USE_GETTIMEOFDAY */
 
-double ** code(int mypid, int nnodes, int size, int times, int window)
+double ** code(int mypid, int nnodes, long size, long times, long window)
 {
     /* arguments are:
      *   mypid  = rank of this process
@@ -72,7 +73,7 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
 
     /* collect hostnames of all the processes */
     gethostname(hostname, sizeof(hostname));
-    cout<<hostname;
+    //cout<<hostname;
     hostnames = (char*) malloc(sizeof(hostname)*nnodes);
     MPI_Gather(hostname, sizeof(hostname), MPI_CHAR, hostnames, sizeof(hostname), MPI_CHAR, 0, MPI_COMM_WORLD);
     
@@ -257,7 +258,21 @@ double ** code(int mypid, int nnodes, int size, int times, int window)
         }
 
     }
-
+    if(mypid == 0){
+        printf("\n");
+        printf("Combined\t\t\t");
+        for(int k=0; k<nnodes; k++) {
+            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+        }
+        printf("\n");
+        for(int j=0; j<nnodes; j++) {
+            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(int k=0; k<nnodes; k++) {
+                printf("%0.3f\t\t", arr[j][k]);
+            }
+            printf("\n");
+        }
+    }
 
     /* free off memory */
     if (mypid == 0) {
@@ -561,7 +576,7 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
 
 bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
-                string &NodeNameStr, double **dist)
+                string &NodeNameStr, double **dist, double THRESHOLD)
 {
     bool IsOk = true;
 
@@ -578,7 +593,7 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
             if(rankmark[i] == -1){
                 rankmark[i]=temp;
                 for (j=0;j< Size;j++){
-                    if(i!=j && dist[i][j]<80.0){
+                    if(i!=j && dist[i][j]<THRESHOLD){
                         rankmark[j]=temp;
                     }
                 }
@@ -626,14 +641,14 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
 }
 
 
-void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist){
+void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist, double THRESHOLD){
 
     int world_rank = MPI::COMM_WORLD.Get_rank();
     int world_size = MPI::COMM_WORLD.Get_size();
 
     int NodeRank, MasterRank, NodeSize, MasterSize;
     string NodeNameStr;
-    bool b = l1_CommByDatacenter(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr,dist);
+    bool b = l1_CommByDatacenter(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr,dist, THRESHOLD);
 
 
     //Get the group of processes in MPI_COMM_WORLD
