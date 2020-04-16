@@ -258,21 +258,21 @@ double ** code(int mypid, int nnodes, long size, long times, long window)
         }
 
     }
-    if(mypid == 0){
-        printf("\n");
-        printf("Combined\t\t\t");
-        for(int k=0; k<nnodes; k++) {
-            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-        }
-        printf("\n");
-        for(int j=0; j<nnodes; j++) {
-            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-            for(int k=0; k<nnodes; k++) {
-                printf("%0.3f\t\t", arr[j][k]);
-            }
-            printf("\n");
-        }
-    }
+//    if(mypid == 0){
+//        printf("\n");
+//        printf("Combined\t\t\t");
+//        for(int k=0; k<nnodes; k++) {
+//            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+//        }
+//        printf("\n");
+//        for(int j=0; j<nnodes; j++) {
+//            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+//            for(int k=0; k<nnodes; k++) {
+//                printf("%0.3f\t\t", arr[j][k]);
+//            }
+//            printf("\n");
+//        }
+//    }
 
     /* free off memory */
     if (mypid == 0) {
@@ -584,6 +584,21 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     int Size = MPI::COMM_WORLD.Get_size();
     int i,j;
     int CommGroup = -1,*rankmark = (int *) malloc(sizeof(int) * Size);
+    if(Rank == 0){
+        printf("\n");
+        printf("Combined\t\t\t");
+        for(int k=0; k<Size; k++) {
+            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+        }
+        printf("\n");
+        for(int j=0; j<Size; j++) {
+            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(int k=0; k<Size; k++) {
+                printf("%0.3f\t\t", dist[j][k]);
+            }
+            printf("\n");
+        }
+    }
     if(Rank == 0) {
         int temp = 0;
         for(i=0;i<Size;i++){
