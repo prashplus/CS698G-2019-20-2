@@ -76,10 +76,18 @@ int main(int argc, char ** argv)
     MPI::Intracomm l2_MasterComm;
     MPI_Comm l2_root_comm;
 
-
-    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm);
     double time1,time2,*data;
     data = (double *)malloc(sizeof(double)*size);
+    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, THRESHOLD);
+    if(MPI_COMM_NULL != l1_root_comm){
+        MPI_Barrier(l1_root_comm);
+        MPI_Bcast(data, size, MPI_DOUBLE, 0, l2_root_comm);
+        MPI_Barrier(l2_root_comm);
+    }
+
+    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm);
+
+
     time1 -= MPI_Wtime();
     if(MPI_COMM_NULL != l2_root_comm){
         MPI_Barrier(l2_root_comm);
@@ -101,7 +109,6 @@ int main(int argc, char ** argv)
     time2 += MPI_Wtime();
     if(world_rank == 0)
         printf("\nMPI_BCAST: Real Rank : %d | Time : %lf", world_rank, time2);
-    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, THRESHOLD);
 
     free(data);
     /* shut down */
