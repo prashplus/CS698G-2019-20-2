@@ -608,11 +608,11 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
             if(rankmark[i] == -1){
                 temp++;
                 rankmark[i]=temp;
-            }
-            for (j=0;j< Size;j++){
-                if(i!=j && dist[i][j]<THRESHOLD){
-                    if(rankmark[j]!=-1)
-                        rankmark[j]=temp;
+                for (j=0;j< Size;j++){
+                    if(i!=j && dist[i][j]<THRESHOLD){
+                        if(rankmark[j]!=-1)
+                            rankmark[j]=temp;
+                    }
                 }
             }
         }
