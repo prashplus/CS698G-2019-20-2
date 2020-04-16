@@ -584,21 +584,21 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     int Size = MPI::COMM_WORLD.Get_size();
     int i,j;
     int CommGroup = -1,*rankmark = (int *) malloc(sizeof(int) * Size);
-//    if(Rank == 0){
-//        printf("\n");
-//        printf("Combined\t\t\t");
-//        for(int k=0; k<Size; k++) {
-//            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-//        }
-//        printf("\n");
-//        for(int j=0; j<Size; j++) {
-//            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-//            for(int k=0; k<Size; k++) {
-//                printf("%0.3f\t\t", dist[j][k]);
-//            }
-//            printf("\n");
-//        }
-//    }
+    if(Rank == 0){
+        printf("\n");
+        printf("Combined\t\t\t");
+        for(int k=0; k<Size; k++) {
+            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+        }
+        printf("\n");
+        for(int j=0; j<Size; j++) {
+            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(int k=0; k<Size; k++) {
+                printf("%0.3f\t\t", dist[j][k]);
+            }
+            printf("\n");
+        }
+    }
     if(Rank == 0) {
         int temp = -1,min=100000;
         for(i=0;i<Size;i++){
@@ -609,8 +609,8 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 temp++;
                 rankmark[i]=temp;
                 for (j=0;j< Size;j++){
-                    if(i!=j && dist[i][j]<THRESHOLD){
-                        if(rankmark[j]!=-1)
+                    if(dist[i][j]<THRESHOLD){
+                        if(rankmark[j]==-1)
                             rankmark[j]=temp;
                     }
                 }
