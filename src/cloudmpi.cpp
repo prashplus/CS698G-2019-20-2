@@ -600,19 +600,19 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
         }
     }
     if(Rank == 0) {
-        int temp = 0;
+        int temp = -1;
         for(i=0;i<Size;i++){
-            rankmark[i] = i;
+            rankmark[i] = -1;
         }
         for (i = 0; i < Size; i++) {
             if(rankmark[i] == -1){
-                rankmark[i]=temp;
-                for (j=0;j< Size;j++){
-                    if(i!=j && dist[i][j]<THRESHOLD){
-                        rankmark[j]=temp;
-                    }
-                }
                 temp++;
+                rankmark[i]=temp;
+            }
+            for (j=0;j< Size;j++){
+                if(i!=j && dist[i][j]<THRESHOLD){
+                    rankmark[j]=temp;
+                }
             }
         }
     }
