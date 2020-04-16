@@ -6,4 +6,4 @@ echo "VM 2 ready"
 ssh prashant@test3asia.southeastasia.cloudapp.azure.com 'bash -s' < init.sh
 echo "VM 3 ready"
 ssh prashant@test4useast.eastus.cloudapp.azure.com 'bash -s' < init.sh
-echo "VM 3 ready"
+echo "VM 4 ready"

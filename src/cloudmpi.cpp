@@ -600,13 +600,12 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 temp++;
             }
         }
-
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(rankmark,Size,MPI_INT,0,MPI_COMM_WORLD);
     CommGroup = rankmark[Rank];
-    //printf("\nCommGroup : %d | Rank : %d",CommGroup,Rank);
+    printf("\nCommGroup : %d | Rank : %d",CommGroup,Rank);
     //  In case process fails, error prints and job aborts.
     if (CommGroup < 0){
         cout << "**ERROR** Rank " << Rank << " didn't identify comm group correctly." << endl;

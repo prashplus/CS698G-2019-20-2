@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
     size = 10000;
     times = 10;
     window = 10;
-    THRESHOLD = 500.0;
+    THRESHOLD = 1000.0;
 
     if (argc == 5) {
         size   = strtol(argv[1],&end,10);
