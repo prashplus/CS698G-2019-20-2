@@ -600,7 +600,7 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
 //        }
 //    }
     if(Rank == 0) {
-        int temp = -1;
+        int temp = -1,min=100000;
         for(i=0;i<Size;i++){
             rankmark[i] = -1;
         }
@@ -616,6 +616,13 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 }
             }
         }
+        for(i=0;i<Size;i++)
+        {
+            if(min>rankmark[i])
+                min = rankmark[i];
+        }
+        for(i=0;i<Size;i++)
+            rankmark[i]-=min;
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
