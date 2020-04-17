@@ -584,51 +584,64 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     int Size = MPI::COMM_WORLD.Get_size();
     int i,j;
     int CommGroup = -1,*rankmark = (int *) malloc(sizeof(int) * Size);
-//    if(Rank == 0){
-//        printf("\n");
-//        printf("Combined\t\t\t");
-//        for(int k=0; k<Size; k++) {
-//            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-//        }
-//        printf("\n");
-//        for(int j=0; j<Size; j++) {
-//            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-//            for(int k=0; k<Size; k++) {
-//                printf("%0.3f\t\t", dist[j][k]);
-//            }
-//            printf("\n");
-//        }
-//    }
+    if(Rank == 0){
+        printf("\n");
+        printf("Combined\t\t\t");
+        for(int k=0; k<Size; k++) {
+            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+        }
+        printf("\n");
+        for(int j=0; j<Size; j++) {
+            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(int k=0; k<Size; k++) {
+                printf("%0.3f\t\t", dist[j][k]);
+            }
+            printf("\n");
+        }
+    }
     if(Rank == 0) {
-        int temp = -1,min=100000;
+        int temp = 0;
+        vector<pair<int,int>> v;
         for(i=0;i<Size;i++){
             rankmark[i] = -1;
         }
+
         for (i = 0; i < Size; i++) {
-            if(rankmark[i] == -1){
-                temp++;
-                rankmark[i]=temp;
-                for (j=0;j< Size;j++){
-                    if(dist[i][j]<THRESHOLD){
-                        if(rankmark[j]==-1)
-                            rankmark[j]=temp;
-                    }
+            for (j=0;j< Size;j++){
+                if(i!=j && dist[i][j]<THRESHOLD){
+                    v.push_back(make_pair(i,j));
                 }
             }
         }
-        for(i=0;i<Size;i++)
-        {
-            if(min>rankmark[i])
-                min = rankmark[i];
+        for(i=0;i<v.size();i++){
+            //printf("v1 : %d, v2 : %d\n", v[i].first,v[i].second);
+            if(rankmark[v[i].first]!= -1){
+                if(rankmark[v[i].second] != -1){
+                }else{
+                    rankmark[v[i].second]= rankmark[v[i].first];
+                }
+            }else{
+                if(rankmark[v[i].second] != -1){
+                    rankmark[v[i].first] = rankmark[v[i].second];
+                }
+                else{
+                    rankmark[v[i].first]=temp;
+                    rankmark[v[i].second]=temp;
+                    temp++;
+                }
+            }
         }
-        for(i=0;i<Size;i++)
-            rankmark[i]-=min;
+        for(i=0;i<Size;i++){
+            if(rankmark[i]==-1)
+                rankmark[i]=temp++;
+            //printf("Rankmark [%d] : [%d]\n",i,rankmark[i]);
+        }
     }
 
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(rankmark,Size,MPI_INT,0,MPI_COMM_WORLD);
     CommGroup = rankmark[Rank];
-    printf("\nCommGroup : %d | Rank : %d",CommGroup,Rank);
+    printf("\nRank : %d | L1 CommGroup : %d",Rank, CommGroup);
     //  In case process fails, error prints and job aborts.
     if (CommGroup < 0){
         cout << "**ERROR** Rank " << Rank << " didn't identify comm group correctly." << endl;

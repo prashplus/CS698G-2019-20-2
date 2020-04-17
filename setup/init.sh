@@ -1,12 +1,14 @@
 #!/bin/bash
+sudo apt install -y zip unzip
 sudo sed -i '/test/d' ./../../etc/hosts
 sudo sed -i '1i137.116.139.58 test2asia' /etc/hosts
 sudo sed -i '1i13.82.82.247 test1useast' /etc/hosts
 sudo sed -i '1i137.116.139.117 test3asia' /etc/hosts
 sudo sed -i '1i13.82.83.246 test4useast' /etc/hosts
 echo "ETC/HOSTS Modified"
-rm -rf *
-git clone https://github.com/prashplus/CloudMPI
+# rm -rf *
+#git clone https://github.com/prashplus/CloudMPI
+unzip cloudmpi.zip
 cd CloudMPI
 touch hosts
 echo "137.116.139.58" >> hosts
