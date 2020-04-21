@@ -78,7 +78,13 @@ int main(int argc, char ** argv)
 
     double time1,time2,*data;
     data = (double *)malloc(sizeof(double)*size);
+    if(world_rank == 0){
+        for(int i =0;i<size;i++)
+            data[i]=(double)i;
+    }
     l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, THRESHOLD);
+    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm, l1_NodeComm);
+
 
     time1 -= MPI_Wtime();
     if(MPI_COMM_NULL != l1_root_comm){
@@ -87,14 +93,10 @@ int main(int argc, char ** argv)
         MPI_Barrier(l1_root_comm);
     }
 
-    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm);
-
-
     //time1 -= MPI_Wtime();
     if(MPI_COMM_NULL != l2_root_comm){
         MPI_Barrier(l2_root_comm);
         MPI_Bcast(data, size, MPI_DOUBLE, 0, l2_root_comm);
-        MPI_Barrier(l2_root_comm);
     }
 
     MPI_Barrier(l2_NodeComm);
@@ -103,7 +105,13 @@ int main(int argc, char ** argv)
     time1 += MPI_Wtime();
     if(world_rank == 0)
         printf("\nCustomBCAST: Real Rank : %d | Time : %lf", world_rank, time1);
-
+    if(world_rank == world_size -1){
+        cout<<"\n Data Received at last rank\n";
+        for(int i =0;i<world_size;i++){
+            printf("\t%lf",data[i]);
+        }
+        cout<<'\n';
+    }
     MPI_Barrier(MPI_COMM_WORLD);
     time2 -= MPI_Wtime();
     MPI_Bcast(data, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);

@@ -293,12 +293,14 @@ double ** code(int mypid, int nnodes, long size, long times, long window)
 
 bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
-                string &NodeNameStr)
+                string &NodeNameStr, MPI::Intracomm &l1_NodeComm)
 {
     bool IsOk = true;
-
-    int Rank = MPI::COMM_WORLD.Get_rank();
-    int Size = MPI::COMM_WORLD.Get_size();
+//    For Normal Operation
+//    int Rank = MPI::COMM_WORLD.Get_rank();
+//    int Size = MPI::COMM_WORLD.Get_size();
+    int Size = l1_NodeComm.Get_size();
+    int Rank = l1_NodeComm.Get_rank();
 
     /*
      * ======================================================================
@@ -323,7 +325,9 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
         NodeNameCountVect = new int [Size];
 
     //  Gather node name lengths to master to prepare c-array
-    MPI::COMM_WORLD.Gather(&NodeNameLen, 1, MPI::INT, NodeNameCountVect, 1, MPI::INT, MASTER);
+    // For Normal Operation
+    //MPI::COMM_WORLD.Gather(&NodeNameLen, 1, MPI::INT, NodeNameCountVect, 1, MPI::INT, MASTER);
+    MPI_Gather(&NodeNameLen, 1, MPI_INT, NodeNameCountVect, 1, MPI_INT, MASTER, l1_NodeComm);
 
     if (Rank == MASTER){
         //  Need character count information for navigating node name c-array
@@ -341,7 +345,9 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     }
 
     //  Gatherv node names to char-array in master
-    MPI::COMM_WORLD.Gatherv(NodeName, NodeNameLen, MPI::CHAR, NodeNameList, NodeNameCountVect, NodeNameOffsetVect, MPI::CHAR, MASTER);
+    // Normal Operation
+    //MPI::COMM_WORLD.Gatherv(NodeName, NodeNameLen, MPI::CHAR, NodeNameList, NodeNameCountVect, NodeNameOffsetVect, MPI::CHAR, MASTER);
+    MPI_Gatherv(NodeName, NodeNameLen, MPI_CHAR, NodeNameList, NodeNameCountVect, NodeNameOffsetVect, MPI_CHAR, MASTER, l1_NodeComm);
 
     string *FullStrList, *NodeStrList;
     //  Each core keeps its node's name in a str for later comparison
@@ -417,9 +423,13 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
      */
 
     //  Bcast the number of nodes in use
-    MPI::COMM_WORLD.Bcast(&NumUniqueNodes, 1, MPI::INT, MASTER);
+    // Normal Operation
+    //MPI::COMM_WORLD.Bcast(&NumUniqueNodes, 1, MPI::INT, MASTER);
+    MPI_Bcast(&NumUniqueNodes, 1, MPI::INT, MASTER, l1_NodeComm);
     //  Bcast the full length of all node names
-    MPI::COMM_WORLD.Bcast(&NodeListCharLen, 1, MPI::INT, MASTER);
+    // Normal Operation
+    //MPI::COMM_WORLD.Bcast(&NodeListCharLen, 1, MPI::INT, MASTER);
+    MPI_Bcast(&NodeListCharLen, 1, MPI::INT, MASTER, l1_NodeComm);
 
     //  prepare buffers for node name Bcast's
     if (Rank > MASTER){
@@ -428,9 +438,13 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     }
 
     //  Lengths of node names for navigating c-string
-    MPI::COMM_WORLD.Bcast(NodeListLenVect, NumUniqueNodes, MPI::INT, MASTER);
+    // Normal Operation
+    //MPI::COMM_WORLD.Bcast(NodeListLenVect, NumUniqueNodes, MPI::INT, MASTER);
+    MPI_Bcast(NodeListLenVect, NumUniqueNodes, MPI::INT, MASTER, l1_NodeComm);
     //  The actual full list of unique node names
-    MPI::COMM_WORLD.Bcast(NodeNameList, NodeListCharLen, MPI::CHAR, MASTER);
+    // Normal Operation
+    //MPI::COMM_WORLD.Bcast(NodeNameList, NodeListCharLen, MPI::CHAR, MASTER);
+    MPI_Bcast(NodeNameList, NodeListCharLen, MPI::CHAR, MASTER, l1_NodeComm);
 
     /*
      * Similar to what master did before, each core (incl master)
@@ -475,7 +489,9 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
      */
 
     //  Create node communicators
-    NodeComm = MPI::COMM_WORLD.Split(CommGroup, 0);
+    // Normal Operation
+    //NodeComm = MPI::COMM_WORLD.Split(CommGroup, 0);
+    NodeComm = l1_NodeComm.Split(CommGroup, 0);
     NodeSize = NodeComm.Get_size();
     NodeRank = NodeComm.Get_rank();
 
@@ -487,7 +503,9 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
         MasterGroup = MPI_UNDEFINED;
 
     //  Create master communicator
-    MasterComm = MPI::COMM_WORLD.Split(MasterGroup, 0);
+    // Normal Operation
+    //MasterComm = MPI::COMM_WORLD.Split(MasterGroup, 0);
+    MasterComm = l1_NodeComm.Split(MasterGroup, 0);
     MasterRank = -1;
     MasterSize = -1;
     if (MasterComm != MPI::COMM_NULL){
@@ -495,23 +513,30 @@ bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
         MasterSize = MasterComm.Get_size();
     }
 
-    MPI::COMM_WORLD.Bcast(&MasterSize, 1, MPI::INT, MASTER);
+    // Normal Operation
+    //MPI::COMM_WORLD.Bcast(&MasterSize, 1, MPI::INT, MASTER);
+    MPI_Bcast(&MasterSize, 1, MPI::INT, MASTER, l1_NodeComm);
     NodeComm.Bcast(&MasterRank, 1, MPI::INT, MASTER);
 
     return IsOk;
 }
 
-void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm){
-
-    int world_rank = MPI::COMM_WORLD.Get_rank();
-    int world_size = MPI::COMM_WORLD.Get_size();
+void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, MPI::Intracomm &l1_NodeComm){
+    //Normal Operation
+//    int world_rank = MPI::COMM_WORLD.Get_rank();
+//    int world_size = MPI::COMM_WORLD.Get_size();
+    int world_rank = l1_NodeComm.Get_rank();
+    int world_size = l1_NodeComm.Get_size();
 
     int NodeRank, MasterRank, NodeSize, MasterSize;
     string NodeNameStr;
-    bool b = CommByNode(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr);
+    bool b = CommByNode(NodeComm, MasterComm, NodeRank, MasterRank, NodeSize, MasterSize, NodeNameStr, l1_NodeComm);
 
+    //Normal Operation
+//    MPI_Group world_group;
+//    MPI_Comm_group(MPI_COMM_WORLD, &world_group);
     MPI_Group world_group;
-    MPI_Comm_group(MPI_COMM_WORLD, &world_group);
+    MPI_Comm_group(l1_NodeComm, &world_group);
 
     int rootRing[MasterSize],i,j,k;
     int *rankMatrix,*rankData;
@@ -522,8 +547,11 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
     rankData[1]=NodeRank;
     rankData[2]=MasterRank;
 
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Allgather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, MPI_COMM_WORLD);
+    //Normal Operation
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    MPI_Allgather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, MPI_COMM_WORLD);
+    MPI_Barrier(l1_NodeComm);
+    MPI_Allgather(rankData, 3, MPI_INT, rankMatrix, 3, MPI_INT, l1_NodeComm);
 
 //    if(rank == 0){
 //        printf("\n");
@@ -551,7 +579,9 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
 
     // Create a new communicator based on the group
 
-    MPI_Comm_create_group(MPI_COMM_WORLD, rootGroup, 0, &root_comm);
+    //Normal Operation
+//    MPI_Comm_create_group(MPI_COMM_WORLD, rootGroup, 0, &root_comm);
+    MPI_Comm_create_group(l1_NodeComm, rootGroup, 0, &root_comm);
 
     int root_rank = -1, root_size = -1;
     // If this rank isn't in the new communicator, it will be
@@ -739,9 +769,9 @@ void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
         MPI_Comm_size(root_comm, &root_size);
     }
 
-    cout << '\n' << NodeNameStr;
-    printf("\nReal Rank : %d | NodeRank : %d | L1 MasterRank : %d | L1 Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
-    printf("\nReal Size : %d | NodeSize : %d | L1 MasterSize : %d | L1 Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
+//    cout << '\n' << NodeNameStr;
+//    printf("\nReal Rank : %d | NodeRank : %d | L1 MasterRank : %d | L1 Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
+//    printf("\nReal Size : %d | NodeSize : %d | L1 MasterSize : %d | L1 Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
 
 
     free(rankMatrix);

@@ -13,9 +13,9 @@ double ** code(int mypid, int nnodes, long size, long times, long window);
 
 bool CommByNode(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                 int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
-                string &NodeNameStr);
+                string &NodeNameStr, MPI::Intracomm &l1_NodeComm);
 
-void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm);
+void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, MPI::Intracomm &l1_NodeComm);
 
 bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
                    int &NodeRank, int &MasterRank, int &NodeSize, int &MasterSize,
