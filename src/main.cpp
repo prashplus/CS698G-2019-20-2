@@ -22,96 +22,34 @@ void test1(){
     //TEST CODE END
 }
 
-double ** test2(){
-    /* print the header */
-    if (world_rank == 0) {
-        /* mark start of output */
-        printf("START mpiGraph \n");
-        printf("MsgSize\t%ld\nTimes\t%ld\nWindow\t%ld\n",size,times,window);
-        printf("Procs\t%d\n\n",world_size);
-    }
-
-    /* synchronize, then start the run */
-    MPI_Barrier(MPI_COMM_WORLD);
-    double ** dist = code(world_rank, world_size, size, times, window);
-    MPI_Barrier(MPI_COMM_WORLD);
-
-    /* mark end of output */
-    if (world_rank == 0) { printf("END mpiGraph\n"); }
-    return dist;
-}
-
-int main(int argc, char ** argv)
-{
-
-    /* start up */
-    MPI_Init(&argc,&argv);
-    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-    char *end;
-    /* set job parameters, read values from command line if they're there */
-    size = 10000;
-    times = 10;
-    window = 10;
-    THRESHOLD = 1000.0;
-
-    if (argc == 5) {
-        size   = strtol(argv[1],&end,10);
-        times  = strtol(argv[2],&end,10);
-        window = strtol(argv[3],&end,10);
-        THRESHOLD = strtol(argv[4],&end,10);
-    }
-
-    //Test 1 : Processor Name
-    //test1();
-
-    //Test 2 : Check Latency Matrix
-    double **dist = test2();
-
-    // Test Rank allocation code
-    MPI::Intracomm l1_NodeComm;
-    MPI::Intracomm l1_MasterComm;
-    MPI_Comm l1_root_comm;
-    MPI::Intracomm l2_NodeComm;
-    MPI::Intracomm l2_MasterComm;
-    MPI_Comm l2_root_comm;
-
+void test3(int size){
     double time1,time2,*data;
     data = (double *)malloc(sizeof(double)*size);
+
+    // Init part of Data at root
     if(world_rank == 0){
-        for(int i =0;i<size;i++)
-            data[i]=(double)i;
+        for(int i = 0;i < 4; i++)
+            data[i]=i;
     }
-    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, THRESHOLD);
-    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm, l1_NodeComm);
 
-
+    MPI_Barrier(MPI_COMM_WORLD);
     time1 -= MPI_Wtime();
-    if(MPI_COMM_NULL != l1_root_comm){
-        MPI_Barrier(l1_root_comm);
-        MPI_Bcast(data, size, MPI_DOUBLE, 0, l1_root_comm);
-        MPI_Barrier(l1_root_comm);
-    }
-
-    //time1 -= MPI_Wtime();
-    if(MPI_COMM_NULL != l2_root_comm){
-        MPI_Barrier(l2_root_comm);
-        MPI_Bcast(data, size, MPI_DOUBLE, 0, l2_root_comm);
-    }
-
-    MPI_Barrier(l2_NodeComm);
-    MPI_Bcast(data, size, MPI_DOUBLE, 0, l2_NodeComm);
-    MPI_Barrier(l2_NodeComm);
+    MPI_CustomBcast(data, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     time1 += MPI_Wtime();
     if(world_rank == 0)
-        printf("\nCustomBCAST: Real Rank : %d | Time : %lf", world_rank, time1);
-    if(world_rank == world_size -1){
-        cout<<"\n Data Received at last rank\n";
-        for(int i =0;i<world_size;i++){
-            printf("\t%lf",data[i]);
-        }
-        cout<<'\n';
-    }
+        printf("\nMPI_CustomBcast: Real Rank : %d | Time : %lf", world_rank, time1);
+
+    // Start Data Received
+//    printf("\n Data Received at rank : %d | ",world_rank);
+//    for(int i =0;i<4;i++){
+//        printf(" %lf ",data[i]);
+//    }
+//    printf("\n");
+    // End Data received
+
+
+    // BuiltIn Bcast
     MPI_Barrier(MPI_COMM_WORLD);
     time2 -= MPI_Wtime();
     MPI_Bcast(data, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
@@ -121,8 +59,42 @@ int main(int argc, char ** argv)
         printf("\nMPI_BCAST: Real Rank : %d | Time : %lf", world_rank, time2);
 
     free(data);
-    /* shut down */
+}
 
+int main(int argc, char ** argv)
+{
+    MPI_Init(&argc,&argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    char *end;
+
+    // Command line parameters
+    size = 1000;
+    times = 10;
+    window = 10;
+    THRESHOLD = 500.0;
+
+    if (argc == 2) {
+        size   = strtol(argv[1],&end,10);
+//        times  = strtol(argv[2],&end,10);
+//        window = strtol(argv[3],&end,10);
+//        THRESHOLD = strtol(argv[4],&end,10);
+    }
+    if (world_rank == 0) {
+        printf("START mpiGraph \n");
+        printf("MsgSize\t%ld\nTimes\t%ld\nWindow\t%ld\n",size,times,window);
+        printf("Procs\t%d\n\n",world_size);
+    }
+
+//    //Test 1 : Processor Name
+//    test1();
+//
+//    //Test 2 : Check Latency Matrix
+//    double **dist = getDist();
+//
+//    //Test 3 : MPI_CustomBcast
+    test3(size);
+    /* shut down */
 
     MPI_Finalize();
     return 0;
