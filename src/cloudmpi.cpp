@@ -61,6 +61,15 @@ double g_timeval__start, g_timeval__end_send, g_timeval__end_recv;
 #endif /* of USE_GETTIMEOFDAY */
 
 
+MPI::Intracomm l1_NodeComm;
+MPI::Intracomm l1_MasterComm;
+MPI_Comm l1_root_comm;
+MPI::Intracomm l2_NodeComm;
+MPI::Intracomm l2_MasterComm;
+MPI_Comm l2_root_comm;
+double **dist;
+
+
 /* ****************************************** Network Matrix FUNCTION***********************************************
  * */
 double ** code(int mypid, int nnodes, long size, long times, long window)
@@ -813,40 +822,35 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
 /* ****************************************** MPI Collective Functions *********************************************** */
 // ###################################################################################################################
 
+/* ************************************************* INIT ************************************************************
+ * */
+
+void init(){
+    dist = getDist();
+    // Test Rank allocation code
+    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, 500);
+    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm, l1_NodeComm);
+}
+
 /* ********************************************** MPI Custom Bcast ***************************************************
  * */
 
 int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_Comm communicator){
-    double **dist = getDist();
-    // Test Rank allocation code
-    MPI::Intracomm l1_NodeComm;
-    MPI::Intracomm l1_MasterComm;
-    MPI_Comm l1_root_comm;
-    MPI::Intracomm l2_NodeComm;
-    MPI::Intracomm l2_MasterComm;
-    MPI_Comm l2_root_comm;
-
-    l1_create_comm(l1_NodeComm,l1_MasterComm, l1_root_comm, dist, 500);
-    l2_create_comm(l2_NodeComm,l2_MasterComm, l2_root_comm, l1_NodeComm);
-
-    // Sync All Ranks
-    MPI_Barrier(MPI_COMM_WORLD);
 
     if(MPI_COMM_NULL != l1_root_comm){
         MPI_Barrier(l1_root_comm);
-        MPI_Bcast(data, count, MPI_DOUBLE, 0, l1_root_comm);
-        MPI_Barrier(l1_root_comm);
+        MPI_Bcast(data, count, datatype, 0, l1_root_comm);
     }
 
     //time1 -= MPI_Wtime();
     if(MPI_COMM_NULL != l2_root_comm){
         MPI_Barrier(l2_root_comm);
-        MPI_Bcast(data, count, MPI_DOUBLE, 0, l2_root_comm);
+        MPI_Bcast(data, count, datatype, 0, l2_root_comm);
     }
 
     MPI_Barrier(l2_NodeComm);
-    MPI_Bcast(data, count, MPI_DOUBLE, 0, l2_NodeComm);
-    MPI_Barrier(l2_NodeComm);
+    MPI_Bcast(data, count, datatype, 0, l2_NodeComm);
+    return 1;
 }
 
 /* ******************************************DEMO FUNCTION***********************************************

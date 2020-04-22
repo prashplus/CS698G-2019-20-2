@@ -22,6 +22,10 @@ void test1(){
     //TEST CODE END
 }
 
+void test2(){
+    double **dist = getDist();
+}
+
 void test3(int size){
     double time1,time2,*data;
     data = (double *)malloc(sizeof(double)*size);
@@ -85,12 +89,13 @@ int main(int argc, char ** argv)
         printf("MsgSize\t%ld\nTimes\t%ld\nWindow\t%ld\n",size,times,window);
         printf("Procs\t%d\n\n",world_size);
     }
-
+    //Initialize all the Comms
+    init();
 //    //Test 1 : Processor Name
 //    test1();
 //
 //    //Test 2 : Check Latency Matrix
-//    double **dist = getDist();
+//    test2();
 //
 //    //Test 3 : MPI_CustomBcast
     test3(size);

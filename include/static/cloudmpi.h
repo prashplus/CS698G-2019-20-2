@@ -25,6 +25,7 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
 void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist, double THRESHOLD);
 
 // ############################ Custom MPI Collective Calls ##############################
+void init();
 int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_Comm communicator);
 
 int add(int a, int b);
