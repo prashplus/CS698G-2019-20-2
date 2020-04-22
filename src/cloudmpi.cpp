@@ -45,10 +45,6 @@ struct timeval  g_timeval__start, g_timeval__end_send, g_timeval__end_recv;
 struct timezone g_timezone;
 
 #else
-/* use MPI_Wtime() for timers instead of gettimeofday() (recommended)
- * on some systems gettimeofday may reset backwards via some global clock,
- * which leads to incorrect timing data including negative time periods
- */
 
 #define __TIME_START__    (g_timeval__start    = MPI_Wtime())
 #define __TIME_END_SEND__ (g_timeval__end_send = MPI_Wtime())
@@ -332,22 +328,7 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     int i,j;
     int CommGroup = -1,*rankmark = (int *) malloc(sizeof(int) * Size);
 
-    // Print Matrix
-    if(Rank == 0){
-        printf("\n");
-        printf("Combined\t\t\t");
-        for(int k=0; k<Size; k++) {
-            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
-        }
-        printf("\n");
-        for(int j=0; j<Size; j++) {
-            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
-            for(int k=0; k<Size; k++) {
-                printf("%0.3f\t\t", dist[j][k]);
-            }
-            printf("\n");
-        }
-    }
+
     if(Rank == 0) {
         int temp = 0;
         vector<pair<int,int>> v;
@@ -807,8 +788,8 @@ void l2_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Co
     }
 
 //    cout << '\n' << NodeNameStr;
-    printf("\nReal Rank : %d | NodeRank : %d | L2 MasterRank : %d | L2 Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
-    printf("\nReal Size : %d | NodeSize : %d | L2 MasterSize : %d | L2 Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
+//    printf("\nReal Rank : %d | NodeRank : %d | L2 MasterRank : %d | L2 Root Rank : %d", world_rank, NodeRank, MasterRank, root_rank);
+//    printf("\nReal Size : %d | NodeSize : %d | L2 MasterSize : %d | L2 Root Size : %d\n", world_size, NodeSize, MasterSize, root_size);
 
     //cout<<"Done L2 Comm";
     free(rankMatrix);

@@ -24,11 +24,29 @@ void test1(){
 
 void test2(){
     double **dist = getDist();
+    if(world_rank == 0){
+        printf("\n");
+        printf("Combined\t\t\t");
+//        for(int k=0; k<world_size; k++) {
+//            printf("%s:%d\t", &hostnames[k*sizeof(hostname)], k);
+//        }
+        printf("\n");
+        for(int j=0; j<world_size; j++) {
+//            printf("%s:%d from\t\t", &hostnames[j*sizeof(hostname)], j);
+            for(int k=0; k<world_size; k++) {
+                printf("%0.3f\t\t", dist[j][k]);
+            }
+            printf("\n");
+        }
+    }
 }
 
 void test3(int size){
-    double time1,time2,*data;
+    double time1=0,time2=0,ftime1,ftime2,*data;
     data = (double *)malloc(sizeof(double)*size);
+
+    FILE *fptr;
+    fptr = fopen("data.txt","a");
 
     // Init part of Data at root
     if(world_rank == 0){
@@ -39,10 +57,9 @@ void test3(int size){
     MPI_Barrier(MPI_COMM_WORLD);
     time1 -= MPI_Wtime();
     MPI_CustomBcast(data, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
+    //MPI_Barrier(MPI_COMM_WORLD);
     time1 += MPI_Wtime();
-    if(world_rank == 0)
-        printf("\nMPI_CustomBcast: Real Rank : %d | Time : %lf", world_rank, time1);
+    MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
     // Start Data Received
 //    printf("\n Data Received at rank : %d | ",world_rank);
@@ -59,8 +76,18 @@ void test3(int size){
     MPI_Bcast(data, size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Barrier(MPI_COMM_WORLD);
     time2 += MPI_Wtime();
+    MPI_Reduce(&time2, &ftime2, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
     if(world_rank == 0)
-        printf("\nMPI_BCAST: Real Rank : %d | Time : %lf", world_rank, time2);
+    {
+        printf("\nMPI_CustomBcast Time : %lf", ftime1);
+        printf("\nMPI_BCAST Time : %lf", ftime2);
+
+        fprintf(fptr,"%lf\n",ftime1);
+        fprintf(fptr,"%lf\n",ftime2);
+        fclose(fptr);
+    }
+
 
     free(data);
 }
@@ -85,9 +112,7 @@ int main(int argc, char ** argv)
 //        THRESHOLD = strtol(argv[4],&end,10);
     }
     if (world_rank == 0) {
-        printf("START mpiGraph \n");
-        printf("MsgSize\t%ld\nTimes\t%ld\nWindow\t%ld\n",size,times,window);
-        printf("Procs\t%d\n\n",world_size);
+        printf("Processes : \t%d\nData Size : \t%ld\nIterations : \t%ld\nWindow : \t%ld\n",world_size,size,times,window);
     }
     //Initialize all the Comms
     init();
@@ -97,9 +122,8 @@ int main(int argc, char ** argv)
 //    //Test 2 : Check Latency Matrix
 //    test2();
 //
-//    //Test 3 : MPI_CustomBcast
+    //Test 3 : MPI_CustomBcast
     test3(size);
-    /* shut down */
 
     MPI_Finalize();
     return 0;
