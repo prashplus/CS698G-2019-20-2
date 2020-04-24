@@ -45,9 +45,6 @@ void test3(int size){
     double time1=0,time2=0,ftime1,ftime2,*data;
     data = (double *)malloc(sizeof(double)*size);
 
-    FILE *fptr;
-    fptr = fopen("data.txt","a");
-
     // Init part of Data at root
     if(world_rank == 0){
         for(int i = 0;i < 4; i++)
@@ -83,11 +80,18 @@ void test3(int size){
         printf("\nMPI_CustomBcast Time : %lf", ftime1);
         printf("\nMPI_BCAST Time : %lf", ftime2);
 
-        fprintf(fptr,"%lf\n",ftime1);
-        fprintf(fptr,"%lf\n",ftime2);
-        fclose(fptr);
+        if (!ifstream("data.txt"))
+        {
+            ofstream temp;
+            temp.open("data.txt",ios::out);
+            temp.close();
+        }
+        ofstream f;
+        f.open ("data.txt",ios::app);
+        f<<ftime1<<'\n';
+        f<<ftime2<<'\n';
+        f.close();
     }
-
 
     free(data);
 }
@@ -112,7 +116,8 @@ int main(int argc, char ** argv)
 //        THRESHOLD = strtol(argv[4],&end,10);
     }
     if (world_rank == 0) {
-        printf("Processes : \t%d\nData Size : \t%ld\nIterations : \t%ld\nWindow : \t%ld\n",world_size,size,times,window);
+        printf("Initializing (will take couple of minutes)\n");
+        printf("Parameters :\nProcesses : \t%d\nData Size : \t%ld\n",world_size,size);
     }
     //Initialize all the Comms
     init();
@@ -123,7 +128,14 @@ int main(int argc, char ** argv)
 //    test2();
 //
     //Test 3 : MPI_CustomBcast
-    test3(size);
+    test3(100);
+    test3(1000);
+    test3(10000);
+    test3(100000);
+    test3(1000000);
+//    test3(10000000);
+//    test3(100000000);
+//    test3(1000000000);
 
     MPI_Finalize();
     return 0;

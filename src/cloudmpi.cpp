@@ -154,7 +154,6 @@ double ** code(int mypid, int nnodes, long size, long times, long window)
     } /* end distance loop */
 
     /* for each node, compute sum of my bandwidths with that node */
-    if(mypid == 0) printf("Gathering results\n");
     double* sendsums = (double*) malloc(sizeof(double)*nnodes);
     double* recvsums = (double*) malloc(sizeof(double)*nnodes);
     for(j=0; j<nnodes; j++) {
@@ -300,17 +299,13 @@ double ** code(int mypid, int nnodes, long size, long times, long window)
 }
 
 double ** getDist(){
-    /* print the header */
     int world_rank = MPI::COMM_WORLD.Get_rank();
     int world_size = MPI::COMM_WORLD.Get_size();
 
-    /* synchronize, then start the run */
     MPI_Barrier(MPI_COMM_WORLD);
     double ** dist = code(world_rank, world_size, 1000, 10, 10);
     MPI_Barrier(MPI_COMM_WORLD);
 
-    /* mark end of output */
-    if (world_rank == 0) { printf("END mpiGraph\n"); }
     return dist;
 }
 
@@ -371,7 +366,7 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Bcast(rankmark,Size,MPI_INT,0,MPI_COMM_WORLD);
     CommGroup = rankmark[Rank];
-    printf("\nRank : %d | L1 CommGroup : %d",Rank, CommGroup);
+    //printf("\nRank : %d | L1 CommGroup : %d",Rank, CommGroup);
     //  In case process fails, error prints and job aborts.
     if (CommGroup < 0){
         cout << "**ERROR** Rank " << Rank << " didn't identify comm group correctly." << endl;
