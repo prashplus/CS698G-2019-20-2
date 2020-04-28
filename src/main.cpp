@@ -80,14 +80,14 @@ void test3(int size){
         printf("\nMPI_CustomBcast Time : %lf", ftime1);
         printf("\nMPI_BCAST Time : %lf", ftime2);
 
-        if (!ifstream("/home/prashant/data.txt"))
+        if (!ifstream("data.txt"))
         {
             ofstream temp;
-            temp.open("/home/prashant/data.txt",ios::out);
+            temp.open("data.txt",ios::out);
             temp.close();
         }
         ofstream f;
-        f.open ("/home/prashant/data.txt",ios::app);
+        f.open ("data.txt",ios::app);
         f<<ftime1<<'\n';
         f<<ftime2<<'\n';
         f.close();
