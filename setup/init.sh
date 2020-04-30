@@ -23,5 +23,5 @@ echo "MPI hostfile Modified"
 export CC=/usr/bin/mpicc
 export CXX=/usr/bin/mpicxx
 cmake ../CloudMPI
-make 
+make
 echo "Make Complete"

@@ -128,11 +128,11 @@ int main(int argc, char ** argv)
 //    test2();
 //
     //Test 3 : MPI_CustomBcast
-    test3(100);
-    test3(1000);
-    test3(10000);
-    test3(100000);
-    test3(1000000);
+    test3(128);
+    test3(1280);
+    test3(12800);
+    test3(131072);
+    test3(1310720);
 //    test3(10000000);
 //    test3(100000000);
 //    test3(1000000000);
