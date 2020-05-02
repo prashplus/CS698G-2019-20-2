@@ -96,6 +96,57 @@ void test3(int size){
     free(data);
 }
 
+void test4(int size){
+    double time1=0,time2=0,ftime1,ftime2,*send_data, *recv_data;
+    int send_count,recv_count;
+    if(world_rank == 0)
+        send_data = (double *)malloc(sizeof(double)*size);
+
+    recv_data = (double *)malloc(sizeof(double)*recv_count);
+    // Init part of Data at root
+    if(world_rank == 0){
+        for(int i = 0;i < 4; i++)
+            send_data[i]=i;
+    }
+
+    //Custom Scatter
+    MPI_Barrier(MPI_COMM_WORLD);
+    time1 -= MPI_Wtime();
+    MPI_CustomScatter(send_data, send_count, MPI_DOUBLE, recv_data, recv_count, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    time1 += MPI_Wtime();
+    MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+
+    //BUILT IN Scatter
+    MPI_Barrier(MPI_COMM_WORLD);
+    time2 -= MPI_Wtime();
+    MPI_Scatter(send_data, send_count, MPI_DOUBLE, recv_data, recv_count, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    time2 += MPI_Wtime();
+    MPI_Reduce(&time2, &ftime2, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    if(world_rank == 0)
+    {
+        printf("\nMPI_CustomBcast Time : %lf", ftime1);
+        printf("\nMPI_BCAST Time : %lf", ftime2);
+
+        if (!ifstream("data.txt"))
+        {
+            ofstream temp;
+            temp.open("data.txt",ios::out);
+            temp.close();
+        }
+        ofstream f;
+        f.open ("data.txt",ios::app);
+        f<<ftime1<<'\n';
+        f<<ftime2<<'\n';
+        f.close();
+    }
+
+    free(send_data);
+    free(recv_data);
+}
+
 int main(int argc, char ** argv)
 {
     MPI_Init(&argc,&argv);
@@ -136,6 +187,9 @@ int main(int argc, char ** argv)
 //    test3(10000000);
 //    test3(100000000);
 //    test3(1000000000);
+
+    //Test 4: MPI_Cust
+    test4(128);
 
     MPI_Finalize();
     return 0;

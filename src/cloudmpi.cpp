@@ -818,7 +818,6 @@ int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_
         MPI_Bcast(data, count, datatype, 0, l1_root_comm);
     }
 
-    //time1 -= MPI_Wtime();
     if(MPI_COMM_NULL != l2_root_comm){
         MPI_Barrier(l2_root_comm);
         MPI_Bcast(data, count, datatype, 0, l2_root_comm);
@@ -828,6 +827,18 @@ int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_
     MPI_Bcast(data, count, datatype, 0, l2_NodeComm);
     return 1;
 }
+
+
+/* ******************************************MPI Custom Scatter FUNCTION***********************************************
+ * */
+int MPI_CustomScatter(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count,
+                      MPI_Datatype recv_datatype, int root, MPI_Comm communicator){
+
+
+
+}
+
+
 
 /* ******************************************DEMO FUNCTION***********************************************
  * */
