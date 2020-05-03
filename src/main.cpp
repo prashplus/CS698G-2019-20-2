@@ -218,15 +218,25 @@ int main(int argc, char ** argv)
         printf("Initializing (will take couple of minutes)\n");
         printf("Parameters :\nProcesses : \t%d\nData Size : \t%ld\n",world_size,size);
     }
+
+
+    /* **************************** YOU MUST CALL init() to use any of Custom Function *****************************
+     *
+     *  */
     //Initialize all the Comms
     init();
+
+
+    /* ********************************** All the test cases of Custom Functions ***********************************
+     *
+     *  */
 //    //Test 1 : Processor Name
 //    test1();
-//
+
 //    //Test 2 : Check Latency Matrix
 //    test2();
-//
-    //Test 3 : MPI_CustomBcast
+
+//    //Test 3 : MPI_CustomBcast
 //    test3(128);
 //    test3(1280);
 //    test3(12800);
@@ -236,8 +246,8 @@ int main(int argc, char ** argv)
 //    test3(100000000);
 //    test3(1000000000);
 
-    //Test 4: MPI_CustomScatter
-    test4(128);
+//    //Test 4: MPI_CustomScatter
+//    test4(128);
 
     //Test 5: MPI_CustomALlreduce
     test5(128);

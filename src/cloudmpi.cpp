@@ -106,6 +106,7 @@ double ** code(int mypid, int nnodes, long size, long times, long window)
             fflush(stdout);
         }
 
+
         /* find tasks distance units to the right (send) and left (recv) */
         int sendpid = (mypid + distance + nnodes) % nnodes;
         int recvpid = (mypid - distance + nnodes) % nnodes;
@@ -153,6 +154,10 @@ double ** code(int mypid, int nnodes, long size, long times, long window)
         distance++;
     } /* end distance loop */
 
+    if (mypid == 0) {
+        printf("%d of %d (100%%)\n", nnodes, nnodes);
+        fflush(stdout);
+    }
     /* for each node, compute sum of my bandwidths with that node */
     double* sendsums = (double*) malloc(sizeof(double)*nnodes);
     double* recvsums = (double*) malloc(sizeof(double)*nnodes);
