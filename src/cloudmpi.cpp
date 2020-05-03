@@ -833,12 +833,26 @@ int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_
  * */
 int MPI_CustomScatter(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count,
                       MPI_Datatype recv_datatype, int root, MPI_Comm communicator){
+    if(MPI_COMM_NULL != l1_root_comm){
+        MPI_Barrier(l1_root_comm);
+    }
 
+    if(MPI_COMM_NULL != l2_root_comm){
+        MPI_Barrier(l2_root_comm);
+    }
 
-
+    MPI_Barrier(l2_NodeComm);
+    return 1;
 }
 
+/* ******************************************MPI Custom All Reduce FUNCTION***********************************************
+ * */
 
+int MPI_CustomAllreduce(void* send_data, void* recv_data, int count,
+        MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator){
+
+    return 1;
+}
 
 /* ******************************************DEMO FUNCTION***********************************************
  * */
