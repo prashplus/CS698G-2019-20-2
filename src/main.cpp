@@ -148,7 +148,7 @@ void test4(int size){
 }
 
 void test5(int size){
-    double time1=0,time2=0,ftime1,ftime2,*send_data, *recv_data;
+    double time1,time2,ftime1,ftime2,*send_data, *recv_data;
     if(world_rank == 0)
         send_data = (double *)malloc(sizeof(double)*size);
 
@@ -156,7 +156,7 @@ void test5(int size){
     // Init part of Data at root
     if(world_rank == 0){
         for(int i = 0;i < 4; i++)
-            send_data[i]=i;
+            send_data[i]=1;
     }
     //Custom Allreduce
     MPI_Barrier(MPI_COMM_WORLD);
@@ -164,6 +164,12 @@ void test5(int size){
     MPI_CustomAllreduce(send_data, recv_data, size, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
     time1 += MPI_Wtime();
     MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+    if(world_rank == 0){
+        cout<<"\n";
+        for(int i = 0;i < 4; i++)
+            cout<<recv_data[i]<<"\t";
+    }
 
     //BUILT IN Scatter
     MPI_Barrier(MPI_COMM_WORLD);

@@ -6,8 +6,8 @@ using namespace std;
 
 #ifndef CS698G_2019_20_2_CLOUDMPI_H
 #define CS698G_2019_20_2_CLOUDMPI_H
-
 #endif //CS698G_2019_20_2_CLOUDMPI_H
+
 
 double ** code(int mypid, int nnodes, long size, long times, long window);
 
@@ -24,12 +24,17 @@ bool l1_CommByDatacenter(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm,
 
 void l1_create_comm(MPI::Intracomm &NodeComm, MPI::Intracomm &MasterComm, MPI_Comm &root_comm, double ** dist, double THRESHOLD);
 
-// ############################ Custom MPI Collective Calls ##############################
+// ############################ Custom MPI Collective Calls #####################################
 void init();
+
 int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_Comm communicator);
+
 int MPI_CustomScatter(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count,
                       MPI_Datatype recv_datatype, int root, MPI_Comm communicator);
+
 int MPI_CustomAllreduce(void* send_data, void* recv_data, int count,
                         MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator);
 
+
+// ############################ Test (Nothing to look beyond this line) ##########################
 int add(int a, int b);
