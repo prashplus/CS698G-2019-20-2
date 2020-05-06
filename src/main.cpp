@@ -148,36 +148,27 @@ void test4(int size){
 }
 
 void test5(int size){
-    double time1,time2,ftime1,ftime2,*send_data, *recv_data;
-    if(world_rank == 0)
-        send_data = (double *)malloc(sizeof(double)*size);
+    double time1,time2,ftime1,ftime2,send_data, recv_data;
 
-    recv_data = (double *)malloc(sizeof(double)*size);
-    // Init part of Data at root
-    if(world_rank == 0){
-        for(int i = 0;i < 4; i++)
-            send_data[i]=1;
-    }
+    send_data
     //Custom Allreduce
-    MPI_Barrier(MPI_COMM_WORLD);
-    time1 -= MPI_Wtime();
-    MPI_CustomAllreduce(send_data, recv_data, size, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
-    time1 += MPI_Wtime();
-    MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+//    MPI_Barrier(MPI_COMM_WORLD);
+//    time1 -= MPI_Wtime();
+//    MPI_CustomAllreduce(send_data, recv_data, size, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
+//    time1 += MPI_Wtime();
+//    MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-    if(world_rank == 0){
-        cout<<"\n";
-        for(int i = 0;i < 4; i++)
-            cout<<recv_data[i]<<"\t";
-    }
 
-    //BUILT IN Scatter
     MPI_Barrier(MPI_COMM_WORLD);
     time2 -= MPI_Wtime();
-    MPI_Allreduce(send_data, recv_data, size, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Allreduce(&send_data, &recv_data, 1, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
     time2 += MPI_Wtime();
-    MPI_Reduce(&time2, &ftime2, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&time2, &ftime2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    if(world_rank == 0){
+        cout<<recv_data<<"\t";
+    }
+
 
     if(world_rank == 0)
     {
@@ -197,8 +188,8 @@ void test5(int size){
         f.close();
     }
 
-    free(send_data);
-    free(recv_data);
+//    free(send_data);
+//    free(recv_data);
 }
 
 int main(int argc, char ** argv)
@@ -256,7 +247,7 @@ int main(int argc, char ** argv)
 //    test4(128);
 
     //Test 5: MPI_CustomALlreduce
-    test5(128);
+    test5(10);
 
     MPI_Finalize();
     return 0;
