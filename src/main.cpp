@@ -148,26 +148,32 @@ void test4(int size){
 }
 
 void test5(int size){
-    double time1,time2,ftime1,ftime2,send_data, recv_data;
+    double time1=0,time2=0,ftime1,ftime2;
+    int *send_data, *recv_data;
 
-    send_data
+    send_data = (int *)malloc(sizeof(int)*size);
+    recv_data = (int *)malloc(sizeof(int)*size);
+
+    for(int i = 0;i < size;i++){
+        send_data[i]=1;
+    }
+
     //Custom Allreduce
-//    MPI_Barrier(MPI_COMM_WORLD);
-//    time1 -= MPI_Wtime();
-//    MPI_CustomAllreduce(send_data, recv_data, size, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
-//    time1 += MPI_Wtime();
-//    MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
+    time1 -= MPI_Wtime();
+    MPI_CustomAllreduce(send_data, recv_data, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    time1 += MPI_Wtime();
+    MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
+    cout<<"\nRank : "<<world_rank<<"\n ";
+    for(int i=0;i<5;i++)
+        cout<<recv_data[i]<<"\t";
 
     MPI_Barrier(MPI_COMM_WORLD);
     time2 -= MPI_Wtime();
-    MPI_Allreduce(&send_data, &recv_data, 1, MPI_DOUBLE, MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(send_data, recv_data, size, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
     time2 += MPI_Wtime();
-    MPI_Reduce(&time2, &ftime2, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-
-    if(world_rank == 0){
-        cout<<recv_data<<"\t";
-    }
+    MPI_Reduce(&time2, &ftime2, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 
     if(world_rank == 0)
@@ -247,7 +253,7 @@ int main(int argc, char ** argv)
 //    test4(128);
 
     //Test 5: MPI_CustomALlreduce
-    test5(10);
+    test5(size);
 
     MPI_Finalize();
     return 0;

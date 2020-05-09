@@ -853,8 +853,13 @@ int MPI_CustomScatter(void* send_data, int send_count, MPI_Datatype send_datatyp
 /* ******************************************MPI Custom All Reduce FUNCTION***********************************************
  * */
 
-int MPI_CustomAllreduce(void* send_data, void* recv_data, int count,
-        MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator){
+int MPI_CustomAllreduce(void* send_data, void* recv_data, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm communicator){
+
+    MPI_Reduce(send_data, recv_data, count, datatype, op, 0, communicator);
+
+    MPI_Barrier(communicator);
+
+    MPI_CustomBcast(recv_data, count, datatype, 0, communicator);
 
     return 1;
 }
