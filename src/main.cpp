@@ -98,9 +98,9 @@ void test3(int size){
 
 void test4(int size){
     double time1=0,time2=0,ftime1,ftime2,*send_data, *recv_data;
-    int send_count,recv_count;
+    int send_count = size,recv_count = size;
     if(world_rank == 0)
-        send_data = (double *)malloc(sizeof(double)*size);
+        send_data = (double *)malloc(sizeof(double)*send_count);
 
     recv_data = (double *)malloc(sizeof(double)*recv_count);
     // Init part of Data at root
@@ -116,6 +116,8 @@ void test4(int size){
     time1 += MPI_Wtime();
     MPI_Reduce(&time1, &ftime1, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
+    cout<<"\nRank : "<<world_rank<<"\n ";
+    cout<<recv_data[0]<<"\t";
 
     //BUILT IN Scatter
     MPI_Barrier(MPI_COMM_WORLD);
@@ -249,11 +251,11 @@ int main(int argc, char ** argv)
 //    test3(100000000);
 //    test3(1000000000);
 
-//    //Test 4: MPI_CustomScatter
-//    test4(128);
+    //Test 4: MPI_CustomScatter
+    test4(size);
 
-    //Test 5: MPI_CustomALlreduce
-    test5(size);
+//    //Test 5: MPI_CustomALlreduce
+//    test5(size);
 
     MPI_Finalize();
     return 0;

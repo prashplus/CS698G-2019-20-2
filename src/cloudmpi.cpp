@@ -838,15 +838,24 @@ int MPI_CustomBcast(void *data, int count, MPI_Datatype datatype, int root, MPI_
  * */
 int MPI_CustomScatter(void* send_data, int send_count, MPI_Datatype send_datatype, void* recv_data, int recv_count,
                       MPI_Datatype recv_datatype, int root, MPI_Comm communicator){
-    if(MPI_COMM_NULL != l1_root_comm){
-        MPI_Barrier(l1_root_comm);
-    }
+    int world_rank, world_size;
+    MPI_Comm_rank(communicator, &world_rank);
+    MPI_Comm_size(communicator, &world_size);
 
-    if(MPI_COMM_NULL != l2_root_comm){
-        MPI_Barrier(l2_root_comm);
-    }
+//    MPI_Request request1,request2;
+//    MPI_Status status1,status2;
 
-    MPI_Barrier(l2_NodeComm);
+    double *send = (double *)send_data;
+
+    if(world_rank == root){
+        for(int i = 0;i< world_size ; i++){
+            if(i != root)
+                MPI_Send(send + i*send_count, send_count, send_datatype, i, 7, communicator);
+        }
+    }
+    else{
+        MPI_Recv(recv_data, recv_count, recv_datatype, world_rank, 7, communicator, MPI_STATUS_IGNORE);
+    }
     return 1;
 }
 
