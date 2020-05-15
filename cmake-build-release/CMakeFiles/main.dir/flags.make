@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/prashant/CloudMPI/include 
+CXX_INCLUDES = -I/home/prashant/Github/CloudMPI/include 
 
