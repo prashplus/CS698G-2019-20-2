@@ -241,12 +241,12 @@ int main(int argc, char ** argv)
 //    //Test 2 : Check Latency Matrix
 //    test2();
 
-    //Test 3 : MPI_CustomBcast
-    test3(128);
-    test3(1280);
-    test3(12800);
-    test3(131072);
-    test3(1310720);
+//    //Test 3 : MPI_CustomBcast
+//    test3(128);
+//    test3(1280);
+//    test3(12800);
+//    test3(131072);
+//    test3(1310720);
 //    test3(10000000);
 //    test3(100000000);
 //    test3(1000000000);
@@ -254,8 +254,8 @@ int main(int argc, char ** argv)
 //    //Test 4: MPI_CustomScatter
 //    test4(size);
 
-//    //Test 5: MPI_CustomALlreduce
-//    test5(size);
+    //Test 5: MPI_CustomALlreduce
+    test5(size);
 
     MPI_Finalize();
     return 0;
