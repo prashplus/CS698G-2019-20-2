@@ -1,4 +1,0 @@
-/home/prashant/Github/CloudMPI/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/prashant/Github/CloudMPI/cmake-build-release/CMakeFiles/edit_cache.dir
-/home/prashant/Github/CloudMPI/cmake-build-release/CMakeFiles/main.dir
-/home/prashant/Github/CloudMPI/cmake-build-release/CMakeFiles/CloudMPI.dir
