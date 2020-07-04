@@ -196,8 +196,8 @@ void test5(int size){
         f.close();
     }
 
-//    free(send_data);
-//    free(recv_data);
+    free(send_data);
+    free(recv_data);
 }
 
 int main(int argc, char ** argv)
