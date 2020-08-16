@@ -10,6 +10,9 @@ The Project aims to increase the performance of MPI library over the Public Clou
 3. MPI_AllReduce (Current Status: 30% Complete)
 ...
 
+## Guide
+
+* **Preeti Malakar** - - [PMalakar](https://www.cse.iitk.ac.in/users/pmalakar/)
 
 ## Authors
 
